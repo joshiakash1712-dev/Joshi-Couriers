@@ -60,7 +60,9 @@ interface AuthParcelContextType {
   updateParcelStatus: (parcelId: string, newStatus: ParcelStatus, note?: string) => Promise<void>;
   approveParcelOrder: (parcelId: string) => Promise<void>;
   markParcelPicked: (parcelId: string) => Promise<void>;
-  markParcelShipped: (parcelId: string) => Promise<void>;
+  updateParcelPayment: (parcelId: string, paymentStatus: 'pending' | 'collected') => Promise<void>;
+  bulkApproveOrders: (parcelIds: string[]) => Promise<void>;
+  bulkMarkPicked: (parcelIds: string[]) => Promise<void>;
   getClientReports: (timeframe: 'this_month' | 'past_6_months' | 'yearly' | 'all_time') => ClientReportSummary;
   getParcelById: (parcelId: string) => ParcelItem | undefined;
   fetchParcelByTrackingId: (parcelId: string) => Promise<ParcelItem | null>;
@@ -69,8 +71,8 @@ interface AuthParcelContextType {
 
 const AuthParcelContext = createContext<AuthParcelContextType | undefined>(undefined);
 
-// Admin emails list - app owner joshiakash1712@gmail.com is primary administrator
-const ADMIN_EMAILS = ['joshiakash1712@gmail.com', 'admin@joshicouriers.com'];
+// Admin emails list - app owners and administrators
+const ADMIN_EMAILS = ['joshiakash1712@gmail.com', 'joshiakash1209@gmail.com', 'admin@joshicouriers.com'];
 
 export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
@@ -525,6 +527,37 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     await updateParcelStatus(parcelId, 'shipped', 'Parcel delivered safely to receiver. Handover complete.');
   };
 
+  const updateParcelPayment = async (parcelId: string, paymentStatus: 'pending' | 'collected') => {
+    const existing = parcels.find(p => p.id === parcelId);
+    if (!existing) return;
+    const updates = { paymentStatus };
+    setParcels(prev => prev.map(p => p.id === parcelId ? { ...p, ...updates } : p));
+    try {
+      await updateDoc(doc(db, 'parcels', parcelId), updates);
+    } catch (err: any) {
+      console.warn('Error updating parcel payment status:', err);
+      if (err?.code === 'permission-denied') {
+        try {
+          handleFirestoreError(err, OperationType.UPDATE, `parcels/${parcelId}`);
+        } catch {
+          // Handled and reported
+        }
+      }
+    }
+  };
+
+  const bulkApproveOrders = async (parcelIds: string[]) => {
+    for (const id of parcelIds) {
+      await approveParcelOrder(id);
+    }
+  };
+
+  const bulkMarkPicked = async (parcelIds: string[]) => {
+    for (const id of parcelIds) {
+      await markParcelPicked(id);
+    }
+  };
+
   const getParcelById = (parcelId: string): ParcelItem | undefined => {
     return parcels.find(p => p.id.toLowerCase() === parcelId.toLowerCase().trim());
   };
@@ -815,6 +848,9 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         approveParcelOrder,
         markParcelPicked,
         markParcelShipped,
+        updateParcelPayment,
+        bulkApproveOrders,
+        bulkMarkPicked,
         getClientReports,
         getParcelById,
         fetchParcelByTrackingId,
