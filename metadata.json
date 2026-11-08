@@ -1,0 +1,6 @@
+{
+  "name": "Joshi Couriers",
+  "description": "Business-focused local courier service. We pickup in Jalna, ship to Partur next morning (6:30-8:30 AM), and connect onward to Mantha with trusted partners.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

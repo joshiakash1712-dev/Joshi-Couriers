@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile with role and merchant details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "businessName": { "type": "string" },
+        "city": { "type": "string" },
+        "defaultAddress": { "type": "string" },
+        "role": { "type": "string", "enum": ["customer", "admin", "team"] },
+        "avatarUrl": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "role", "createdAt"]
+    },
+    "ParcelItem": {
+      "title": "ParcelItem",
+      "description": "Delivery shipment booking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderPhone": { "type": "string" },
+        "senderEmail": { "type": "string" },
+        "senderBusiness": { "type": "string" },
+        "pickupAddress": { "type": "string" },
+        "fromLocationId": { "type": "string" },
+        "fromCity": { "type": "string" },
+        "toLocationId": { "type": "string" },
+        "toCity": { "type": "string" },
+        "receiverName": { "type": "string" },
+        "receiverPhone": { "type": "string" },
+        "deliveryAddress": { "type": "string" },
+        "parcelType": { "type": "string" },
+        "weightCategory": { "type": "string" },
+        "notes": { "type": "string" },
+        "fare": { "type": "number" },
+        "paymentMode": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "scheduledDeliveryDate": { "type": "string" },
+        "deliverySlot": { "type": "string" }
+      },
+      "required": ["id", "userId", "senderName", "senderPhone", "fromCity", "toCity", "fare", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile collection"
+    },
+    "/parcels/{parcelId}": {
+      "schema": "ParcelItem",
+      "description": "Parcel delivery bookings collection"
+    }
+  }
+}

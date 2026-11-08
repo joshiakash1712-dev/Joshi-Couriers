@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 1. Global Box Sizing & Layout Foundation */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Poppins', 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #FDFDFE;
+  color: #0f172a;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  background-color: #0B0F19;
+  color: #f8fafc;
+}
+
+/* 2. Media & Asset Responsiveness */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe,
+embed,
+object {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+/* 3. Typography & Text Wrapping Safety */
+h1, h2, h3, h4, h5, h6, p, span, a, label, li, td, th {
+  overflow-wrap: break-word;
+}
+
+/* 4. Touch Targets & Interaction */
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+:root {
+  --color-persian-blue: #0038BD;
+  --color-carrot-orange: #EF8E01;
+  --color-platinum: #EEEEEE;
+}
+
+/* Custom architectural tab notch styles */
+.card-notch-top {
+  position: relative;
+  border-top-left-radius: 0px;
+}
+
+.blueprint-grid {
+  background-image: 
+    linear-gradient(to right, rgba(0, 56, 189, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 56, 189, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.blueprint-grid-dark {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

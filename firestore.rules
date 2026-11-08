@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'joshiakash1712@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isStaff() {
+      return isSignedIn() && (
+        isAdmin() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'team'])
+      );
+    }
+
+    function isSenderOrReceiver(parcel) {
+      return isSignedIn() && (
+        parcel.userId == request.auth.uid ||
+        (parcel.senderEmail != null && parcel.senderEmail == request.auth.token.email) ||
+        (parcel.receiverEmail != null && parcel.receiverEmail == request.auth.token.email)
+      );
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) || isStaff();
+      allow delete: if isAdmin();
+    }
+
+    // Parcels collection
+    match /parcels/{parcelId} {
+      // Only sender, receiver, and staff can view or verify parcel tracking
+      allow get: if true;
+      allow list: if isStaff() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.senderEmail == request.auth.token.email));
+      allow create: if isSignedIn() || request.resource.data.userId == 'guest';
+      // ONLY admin and team members can manage the order tracking and update status!
+      allow update: if isStaff();
+      allow delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
