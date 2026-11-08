@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "joshi-couriers",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Daily corridor parcel dispatch and live tracking portal for Jalna, Partur, and Mantha operated by Joshi Couriers.",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
