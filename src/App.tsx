@@ -9,6 +9,7 @@ import { PortalAccessBanner } from './components/PortalAccessBanner';
 import { NoticeBar } from './components/NoticeBar';
 import { BusinessFeatures } from './components/BusinessFeatures';
 import { PricingCtaSection } from './components/PricingCtaSection';
+import { FAQSection } from './components/FAQSection';
 import { TrustBar } from './components/TrustBar';
 import { Footer } from './components/Footer';
 import { BookingModal } from './components/BookingModal';
@@ -78,7 +79,10 @@ function MainApp() {
         {/* 7. Pricing & Action Buttons Section */}
         <PricingCtaSection onOpenBooking={() => setIsBookingOpen(true)} />
 
-        {/* 8. Bottom Trust Strip */}
+        {/* 8. Frequently Asked Questions */}
+        <FAQSection onOpenBooking={() => setIsBookingOpen(true)} />
+
+        {/* 9. Bottom Trust Strip */}
         <TrustBar />
 
       </main>
