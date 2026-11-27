@@ -75,7 +75,7 @@ export const PricingCtaSection: React.FC<PricingCtaSectionProps> = ({ onOpenBook
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-              ₹70 base fare. Price may vary beyond Partur based on destination &amp; parcel size/weight.
+              ₹70 base fare. Price varies by corridor stop between Jalna and Partur and parcel size/weight.
             </p>
           </div>
 

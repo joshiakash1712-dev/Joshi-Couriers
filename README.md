@@ -5,12 +5,12 @@
   <br />
 
   <p align="center">
-    <strong>Daily corridor parcel dispatch and live tracking portal for Jalna, Partur, and Mantha.</strong><br />
+    <strong>Daily corridor parcel dispatch and live tracking portal for Jalna to Partur.</strong><br />
     Run directly by father &amp; son (Anant Joshi &amp; Akash Joshi) in dedicated vehicle <strong>Mahindra Maxximo (MH21 V 6370)</strong>.
   </p>
 
   <p align="center">
-    <a href="#-quick-features"><img src="https://img.shields.io/badge/Corridor-Jalna_%E2%9E%94_Partur_%E2%9E%94_Mantha-0038BD?style=for-the-badge&logo=google-maps&logoColor=white" alt="Corridor" /></a>
+    <a href="#-quick-features"><img src="https://img.shields.io/badge/Corridor-Jalna_%E2%9E%94_Partur-0038BD?style=for-the-badge&logo=google-maps&logoColor=white" alt="Corridor" /></a>
     <a href="#-daily-fleet--specs"><img src="https://img.shields.io/badge/Vehicle-MH21_V_6370_(Maxximo)-EF8E01?style=for-the-badge&logo=toyota&logoColor=white" alt="Vehicle" /></a>
     <a href="#-live-tracking-pipeline"><img src="https://img.shields.io/badge/Delivery_Slot-6%3A30_--_8%3A30_AM-10B981?style=for-the-badge&logo=clock&logoColor=white" alt="Delivery Slot" /></a>
   </p>
@@ -31,7 +31,7 @@
 
 ## 🧭 Overview
 
-**Joshi Couriers** is a specialized B2B and merchant logistics service connecting the industrial and textile hubs of **Jalna** to retail shops and medical distributors in **Partur** and **Mantha**. Unlike corporate hub-and-spoke couriers that route local parcels through distant Aurangabad or Pune sorting hubs, Joshi Couriers provides **zero-sorting, point-to-point morning corridor transport**.
+**Joshi Couriers** is a specialized B2B and merchant logistics service connecting the industrial and textile hubs of **Jalna** to retail shops and medical distributors in **Partur** and en-route NH-752I stops. Unlike corporate hub-and-spoke couriers that route local parcels through distant Aurangabad or Pune sorting hubs, Joshi Couriers provides **zero-sorting, point-to-point morning corridor transport**.
 
 Packages picked up from Jalna merchants in the late afternoon are securely stowed in **Mahindra Maxximo (MH21 V 6370)**, dispatched at 4:00 AM, and delivered hand-to-hand to shopkeepers in Partur between **6:30 AM and 8:30 AM** before markets open.
 
@@ -61,7 +61,7 @@ Packages picked up from Jalna merchants in the late afternoon are securely stowe
          │           • Consignments loaded from Subhash Road, Cloth Market & MIDC
          │           • Secure stowage in Mahindra Maxximo MH21 V 6370
          ▼
-  [05:00 - 06:00 AM] NH-752I HIGHWAY CORRIDOR (68 KM)
+  [05:00 - 06:00 AM] NH-752I HIGHWAY CORRIDOR (50 KM)
          │           • Direct point-to-point transit (Zero hub rerouting)
          │           • Weatherproof tarp + roof carrier tie-downs
          ▼
@@ -70,11 +70,8 @@ Packages picked up from Jalna merchants in the late afternoon are securely stowe
          │           • Consignments sorted by bazaar delivery routes
          ▼
   [06:30 - 08:30 AM] HAND-TO-HAND SHOP DELIVERIES
-         │           • Doorstep handover to merchants before shutters open
-         │           • Cash-on-Delivery (COD) reconciliation
-         ▼
-  [08:30 - 10:00 AM] MANTHA EXTENSION RUN
-                     • Connecting handover via trusted partner network
+                     • Doorstep handover to merchants before shutters open
+                     • Cash-on-Delivery (COD) reconciliation
 ```
 
 </details>
@@ -90,12 +87,12 @@ Every shipment booked on the platform follows an unambiguous 3-phase progression
 |:---|:---|:---|:---|
 | **Phase 1** | `ordered` | Order request confirmed by admin | Jalna evening pickup scheduled |
 | **Phase 2** | `picked` | Loaded into transport vehicle | Transporter has parcel inside MH21 V 6370 |
-| **Phase 3** | `shipped` | Hand-to-hand delivery completed | Delivered to receiver in Partur or Mantha |
+| **Phase 3** | `shipped` | Hand-to-hand delivery completed | Delivered to receiver in Partur |
 
 > **Sample Tracking IDs to test in the portal:**
 > - `JC-84920` (Textile bolts to Partur Cloth Center)
-> - `JC-10294` (Automotive gaskets to Mantha Auto Works)
-> - `JC-39182` (Agri seeds to Jalna Seed Mart)
+> - `JC-10294` (Automotive gaskets to Partur Auto Works)
+> - `JC-39182` (Agri seeds to Watur Phata Agro Mart)
 
 </details>
 
@@ -111,7 +108,7 @@ The admin console provides 1-click formatted manifest generation designed specif
 *Fleet Vehicle:* Mahindra Maxximo (MH21 V 6370)
 *Transporter Team:* Anant Joshi & Akash Joshi (+91 94040 40606)
 *Dispatch Date:* Today
-*Corridor:* Jalna (4:00-5:00 AM) ➔ Partur (6:00-6:30 AM) ➔ Mantha
+*Corridor:* Jalna (4:00-5:00 AM) ➔ Partur (6:00-6:30 AM)
 *Delivery Window:* 6:30 - 8:30 AM Doorstep Delivery
 ===========================================
 
@@ -121,9 +118,9 @@ The admin console provides 1-click formatted manifest generation designed specif
    *Item:* Cotton Sarees [1-5 kg]
    *Fare:* ₹75 [COLLECT CASH ON DELIVERY]
 
-2. [JC-39182] Jalna ➔ Mantha (PICKED)
+2. [JC-39182] Jalna ➔ Watur Phata (PICKED)
    *To:* Balaji Agro Agency (+91 98221 44556)
-   *Drop Address:* Main Market Road, Mantha
+   *Drop Address:* NH-752I Main Junction, Watur Phata
    *Item:* Hybrid Cotton Seeds [5-10 kg]
    *Fare:* ₹95 [PAID ONLINE/DIRECT]
 
@@ -139,12 +136,12 @@ The admin console provides 1-click formatted manifest generation designed specif
 
 <br />
 
-| Weight Tier | Typical Cargo Items | Jalna to Partur | Jalna to Mantha | Delivery Window |
-|:---|:---|:---:|:---:|:---:|
-| **Upto 1 kg (Docs/Packets)** | Legal docs, sample swatches, medicines | **₹50** | **₹65** | Next Morning 6:30-8:30 AM |
-| **1 kg to 5 kg (Standard)** | Small cloth parcels, electronics, auto spares | **₹75** | **₹90** | Next Morning 6:30-8:30 AM |
-| **5 kg to 10 kg (Medium)** | Cotton bolts, hardware kits, bulk seeds | **₹95** | **₹115** | Next Morning 6:30-8:30 AM |
-| **10 kg to 20 kg (Heavy)** | Machine parts, wholesale goods, bulk textiles | **₹130** | **₹150** | Next Morning 6:30-8:30 AM |
+| Weight Tier | Typical Cargo Items | Jalna to Partur | Delivery Window |
+|:---|:---|:---:|:---:|
+| **Upto 1 kg (Docs/Packets)** | Legal docs, sample swatches, medicines | **₹50** | Next Morning 6:30-8:30 AM |
+| **1 kg to 5 kg (Standard)** | Small cloth parcels, electronics, auto spares | **₹75** | Next Morning 6:30-8:30 AM |
+| **5 kg to 10 kg (Medium)** | Cotton bolts, hardware kits, bulk seeds | **₹95** | Next Morning 6:30-8:30 AM |
+| **10 kg to 20 kg (Heavy)** | Machine parts, wholesale goods, bulk textiles | **₹130** | Next Morning 6:30-8:30 AM |
 
 </details>
 
@@ -269,5 +266,5 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
   <br />
   <p><strong>Joshi Couriers</strong> • Run by Anant Joshi &amp; Akash Joshi</p>
   <p>Old Jalna • Station Road • Phone: <a href="tel:+919404040606">+91 94040 40606</a></p>
-  <p><em>Jalna ➔ Partur ➔ Mantha Morning Corridor Service</em></p>
+  <p><em>Jalna ➔ Partur Morning Corridor Service</em></p>
 </div>

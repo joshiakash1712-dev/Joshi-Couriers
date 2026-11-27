@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthParcelProvider } from './context/AuthParcelContext';
 import { ToastProvider } from './context/ToastContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { RouteTimelineCard } from './components/RouteTimelineCard';
@@ -97,6 +98,7 @@ function MainApp() {
         initialFromId="jalna"
         initialToId="partur"
         onViewMyParcels={() => setIsCustomerParcelsOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
       {/* Authentication / Sign In Modal */}
@@ -105,11 +107,15 @@ function MainApp() {
         onClose={() => setIsAuthOpen(false)}
         onOpenCustomerParcels={() => {
           setIsAuthOpen(false);
-          setIsCustomerParcelsOpen(true);
+          if (!isBookingOpen) {
+            setIsCustomerParcelsOpen(true);
+          }
         }}
         onOpenAdmin={() => {
           setIsAuthOpen(false);
-          setIsAdminOpen(true);
+          if (!isBookingOpen) {
+            setIsAdminOpen(true);
+          }
         }}
       />
 
@@ -126,6 +132,7 @@ function MainApp() {
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}
         onOpenBooking={() => setIsBookingOpen(true)}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
     </div>
   );
@@ -136,7 +143,9 @@ export default function App() {
     <ThemeProvider>
       <AuthParcelProvider>
         <ToastProvider>
-          <MainApp />
+          <NotificationProvider>
+            <MainApp />
+          </NotificationProvider>
         </ToastProvider>
       </AuthParcelProvider>
     </ThemeProvider>

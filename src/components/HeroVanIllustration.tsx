@@ -18,7 +18,7 @@ export const HeroVanIllustration: React.FC<HeroVanIllustrationProps> = ({ onOpen
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0038BD] bg-[#0038BD]/10 px-2.5 py-1 rounded-md flex items-center gap-1">
               <Navigation className="w-3 h-3 text-[#0038BD]" />
-              SH-176 EXPRESS CORRIDOR
+              NH-752I EXPRESS CORRIDOR
             </span>
             <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md hidden sm:inline-flex items-center gap-1">
               <Compass className="w-3 h-3 text-[#EF8E01]" />

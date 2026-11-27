@@ -123,6 +123,7 @@ export interface ClientReportSummary {
   pickedCount: number;
   shippedCount: number;
   monthlyTrend: ClientMonthlyStat[];
+  ordersInPeriod: ParcelItem[];
 }
 
 export interface AnalyticsSummary {

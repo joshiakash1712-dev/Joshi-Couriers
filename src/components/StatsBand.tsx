@@ -32,9 +32,9 @@ export const StatsBand: React.FC = () => {
     },
     {
       icon: <MapPin className="w-8 h-8 text-white mx-auto mb-2" strokeWidth={2} />,
-      value: '15 Stops',
+      value: '9 Stops',
       label: 'Connected Regional Hubs',
-      desc: 'Dedicated 65 km NH-752I corridor connecting Jalna, Watur, Partur & Mantha.',
+      desc: 'Dedicated 50 km NH-752I corridor connecting Jalna, Watur & Partur.',
     },
   ];
 

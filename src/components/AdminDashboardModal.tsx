@@ -22,8 +22,8 @@ import {
   Printer,
   ChevronDown,
   RefreshCw,
-  ArrowRight,
-  Send
+  Trash2,
+  Lock
 } from 'lucide-react';
 import { useAuthParcel } from '../context/AuthParcelContext';
 import { useToast } from '../hooks/useToast';
@@ -33,14 +33,17 @@ interface AdminDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenBooking: () => void;
+  onOpenAuth?: () => void;
 }
 
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   isOpen,
   onClose,
   onOpenBooking,
+  onOpenAuth,
 }) => {
   const { 
+    currentUser,
     parcels, 
     analytics, 
     updateParcelStatus, 
@@ -48,6 +51,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     markParcelPicked, 
     markParcelShipped,
     updateParcelPayment,
+    deleteParcel,
     bulkApproveOrders,
     bulkMarkPicked
   } = useAuthParcel();
@@ -61,6 +65,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'fare_desc'>('newest');
   const [copiedManifest, setCopiedManifest] = useState(false);
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Phase counts
   const phaseCounts = useMemo(() => {
@@ -101,7 +107,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         // Route filter
         if (selectedRouteFilter !== 'all') {
           if (selectedRouteFilter === 'partur' && p.toLocationId !== 'partur') return false;
-          if (selectedRouteFilter === 'mantha' && p.toLocationId !== 'mantha') return false;
+          if (selectedRouteFilter === 'corridor' && p.toLocationId === 'partur') return false;
         }
 
         // Payment filter
@@ -137,6 +143,87 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   }, [parcels, selectedPhaseFilter, selectedRouteFilter, selectedPaymentFilter, manifestSearch, sortBy]);
 
   if (!isOpen) return null;
+
+  const isStaffMember = currentUser?.role === 'admin' || currentUser?.role === 'team';
+  const isVerifiedAdmin = currentUser?.role === 'admin';
+
+  if (!isStaffMember) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs min-h-[100dvh]">
+        <div
+          className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 text-center space-y-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="admin-auth-gate-title"
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close modal"
+            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800">
+            <Lock className="w-7 h-7" />
+          </div>
+
+          <div>
+            <h2 id="admin-auth-gate-title" className="text-xl font-black text-slate-900 dark:text-white">
+              Admin Authentication Required
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
+              {currentUser
+                ? `Signed in as ${currentUser.email || currentUser.name}. Only authorized Joshi Couriers administrators can view fleet manifests or delete parcel records.`
+                : 'Sign in with an authorized administrator Google account to access fleet manifests, dispatch approvals, and parcel management.'}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+            {onOpenAuth && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenAuth();
+                }}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#0038BD] hover:bg-[#002d99] text-white text-xs font-bold cursor-pointer min-h-[44px]"
+              >
+                {currentUser ? 'Switch to Admin Account' : 'Sign In as Admin'}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer min-h-[44px]"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleDeleteParcel = async (parcelId: string) => {
+    setDeletingId(parcelId);
+    try {
+      await deleteParcel(parcelId);
+      setConfirmDeleteId(null);
+      toast.success(`Parcel record ${parcelId} was permanently deleted by admin.`, {
+        title: 'Consignment Deleted',
+        meta: { trackingId: parcelId },
+        duration: 3500,
+      });
+    } catch (err: any) {
+      toast.error(err?.message || 'Only verified administrators can delete parcel records.', {
+        title: 'Delete Rejected',
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleStatusChange = async (parcelId: string, newStatus: ParcelStatus) => {
     await updateParcelStatus(parcelId, newStatus);
@@ -205,7 +292,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     text += `*Fleet Vehicle:* Mahindra Maxximo (MH21 V 6370)\n`;
     text += `*Transporter Team:* Anant Joshi & Akash Joshi (+91 94040 40606)\n`;
     text += `*Dispatch Date:* ${new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}\n`;
-    text += `*Corridor:* Jalna (4:00-5:00 AM) ➔ Partur (6:00-6:30 AM) ➔ Mantha\n`;
+    text += `*Corridor:* Jalna (4:00-5:00 AM) ➔ Partur (6:00-6:30 AM)\n`;
     text += `*Delivery Window:* 6:30 - 8:30 AM Doorstep Delivery\n`;
     text += `===========================================\n\n`;
 
@@ -298,7 +385,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 <span>•</span>
                 <span>Crew: Anant Joshi &amp; Akash Joshi (+91 94040 40606)</span>
                 <span>•</span>
-                <span className="text-emerald-300 font-semibold">Morning Route: Jalna ➔ Partur ➔ Mantha</span>
+                <span className="text-emerald-300 font-semibold">Morning Route: Jalna ➔ Partur</span>
               </p>
             </div>
 
@@ -614,7 +701,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 >
                   <option value="all">All Destinations</option>
                   <option value="partur">Partur Drops Only</option>
-                  <option value="mantha">Mantha Connections Only</option>
+                  <option value="corridor">En-Route Stops Only</option>
                 </select>
               </div>
 
@@ -820,8 +907,50 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                               <option value="delivered">Delivered (Legacy)</option>
                             </select>
                           </div>
+
+                          {isVerifiedAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => setConfirmDeleteId(confirmDeleteId === parcel.id ? null : parcel.id)}
+                              className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+                              title="Admin: Delete parcel record"
+                              aria-label={`Delete parcel ${parcel.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </div>
+
+                      {isVerifiedAdmin && confirmDeleteId === parcel.id && (
+                        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+                          <div className="text-rose-900 dark:text-rose-200">
+                            <strong className="font-bold">Confirm permanent deletion of {parcel.id}?</strong>
+                            <span className="block text-[11px] opacity-90">
+                              Consignment data stays preserved in the database unless an administrator explicitly deletes it.
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setConfirmDeleteId(null)}
+                              disabled={deletingId === parcel.id}
+                              className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold cursor-pointer min-h-[36px]"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteParcel(parcel.id)}
+                              disabled={deletingId === parcel.id}
+                              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-60 min-h-[36px]"
+                            >
+                              {deletingId === parcel.id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                              <span>{deletingId === parcel.id ? 'Deleting...' : 'Delete Permanently'}</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {/* 3-Column Detailed Logistics Information */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-xs">
@@ -1290,7 +1419,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <span>Fleet: Mahindra Maxximo MH21 V 6370</span>
             <span>•</span>
-            <span>Morning Route: Jalna (4:00 - 5:00 AM) ➔ Partur (6:00 - 6:30 AM) ➔ Mantha</span>
+            <span>Morning Route: Jalna (4:00 - 5:00 AM) ➔ Partur (6:00 - 6:30 AM)</span>
             <span>•</span>
             <span className="text-emerald-600 dark:text-emerald-400 font-bold">Doorstep Delivery: 6:30 - 8:30 AM</span>
           </div>

@@ -18,7 +18,6 @@ import {
   Sparkles,
   ChevronRight,
   Phone,
-  Code,
   RefreshCw
 } from 'lucide-react';
 import { useAuthParcel } from '../context/AuthParcelContext';
@@ -53,7 +52,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     signInWithEmail, 
     signUpWithEmail, 
     sendPasswordReset,
-    demoSignIn,
     logout 
   } = useAuthParcel();
 
@@ -73,9 +71,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [loadingAction, setLoadingAction] = useState<string>('');
   const [feedback, setFeedback] = useState<AuthFeedback | null>(null);
   const [resetEmailSent, setResetEmailSent] = useState<boolean>(false);
-  
-  // Discreet Developer 1-Click Access Panel State
-  const [showDevSheet, setShowDevSheet] = useState(false);
 
   // Accessible focus references
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -112,11 +107,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        if (showDevSheet) {
-          setShowDevSheet(false);
-        } else {
-          onClose();
-        }
+        onClose();
       }
     };
     if (isOpen) {
@@ -127,7 +118,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [isOpen, showDevSheet, onClose]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -375,41 +366,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           field: 'general'
         });
       }
-    } finally {
-      setLoading(false);
-      setLoadingAction('');
-    }
-  };
-
-  // Developer Quick Test Sign In
-  const handleDevSignIn = async (role: 'admin' | 'customer') => {
-    clearFeedback();
-    setLoading(true);
-    setLoadingAction(role === 'admin' ? 'Loading Fleet Admin session...' : 'Loading Merchant session...');
-    try {
-      await demoSignIn(role);
-      setShowDevSheet(false);
-      setFeedback({
-        type: 'success',
-        title: 'Developer Session Active',
-        message: role === 'admin' ? 'Authenticated as Fleet Admin (Akash Joshi).' : 'Authenticated as Jalna Merchant (Anand Patel).'
-      });
-      setTimeout(() => {
-        if (onLoginSuccess) onLoginSuccess();
-        if (role === 'admin' && onOpenAdmin) {
-          onOpenAdmin();
-        } else if (onOpenCustomerParcels) {
-          onOpenCustomerParcels();
-        }
-        onClose();
-      }, 500);
-    } catch (err: any) {
-      setFeedback({
-        type: 'error',
-        title: 'Session Error',
-        message: err.message || 'Could not initiate developer preview session.',
-        field: 'general'
-      });
     } finally {
       setLoading(false);
       setLoadingAction('');
@@ -1130,76 +1086,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       </main>
 
-      {/* FOOTER: CALM, DISCREET & DEV-ONLY TESTING LINK */}
-      <footer className="relative z-20 w-full px-5 sm:px-8 py-4 flex items-center justify-between text-[11px] text-white/50">
+      {/* FOOTER */}
+      <footer className="relative z-20 w-full px-5 sm:px-8 py-4 flex items-center justify-between text-[11px] text-white/60">
         <p>Joshi Couriers Direct Logistics</p>
-
-        {/* Discreet Developer 1-Click Access control (Isolated from normal customers) */}
-        <div className="relative">
-          <button
-            id="auth-dev-access-toggle"
-            type="button"
-            onClick={() => setShowDevSheet(!showDevSheet)}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium text-white/50 hover:text-white transition-colors cursor-pointer"
-            title="Development Preview 1-Click Access"
-          >
-            <Code className="w-3 h-3" />
-            <span>Dev Access</span>
-          </button>
-
-          {/* Discreet Flyout for 1-Click Testing */}
-          {showDevSheet && (
-            <div 
-              id="auth-dev-sheet"
-              className="absolute right-0 bottom-8 w-72 p-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-2 z-30 animate-in fade-in slide-in-from-bottom-2 duration-150"
-            >
-              <div className="flex items-center justify-between pb-1 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">
-                  Preview 1-Click Access
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowDevSheet(false)}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">
-                Development test sessions for preview verification:
-              </p>
-              
-              <div className="space-y-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleDevSignIn('admin')}
-                  disabled={loading}
-                  className="w-full text-left p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 border border-amber-200/70 dark:border-amber-900/50 transition-colors cursor-pointer"
-                >
-                  <p className="text-[11px] font-bold text-amber-900 dark:text-amber-200">
-                    Fleet Admin (Akash Joshi)
-                  </p>
-                  <p className="text-[10px] text-amber-800/80 dark:text-amber-300/80">
-                    Full vehicle manifest and analytics access
-                  </p>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleDevSignIn('customer')}
-                  disabled={loading}
-                  className="w-full text-left p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200/70 dark:border-blue-900/50 transition-colors cursor-pointer"
-                >
-                  <p className="text-[11px] font-bold text-blue-900 dark:text-blue-200">
-                    Jalna Merchant (Anand Patel)
-                  </p>
-                  <p className="text-[10px] text-blue-800/80 dark:text-blue-300/80">
-                    Merchant parcel tracking and delivery receipts
-                  </p>
-                </button>
-              </div>
-            </div>
-          )}
+        <div className="flex items-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Verified Account Access</span>
         </div>
       </footer>
     </div>

@@ -48,7 +48,7 @@ export const CustomerTrust: React.FC<CustomerTrustProps> = ({ onOpenBooking }) =
     {
       feature: 'Doorstep Pickup from Shop / Home',
       traditional: 'You have to stand in line at their far-away branch counter',
-      joshi: 'Direct doorstep pickup anywhere in Jalna, Partur, Watur, or Mantha',
+      joshi: 'Direct doorstep pickup anywhere in Jalna, Watur, or Partur',
     },
     {
       feature: 'Handling & Damage Risk',
@@ -103,7 +103,7 @@ export const CustomerTrust: React.FC<CustomerTrustProps> = ({ onOpenBooking }) =
             Trusted by Local Merchants &amp; Families
           </h2>
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mt-2">
-            See how direct daily logistics empowers business between Jalna, Partur, and Mantha.
+            See how direct daily logistics empowers business between Jalna and Partur.
           </p>
         </motion.div>
 

@@ -17,13 +17,13 @@ import {
   db, 
   googleProvider, 
   signInWithPopup, 
-  signInAnonymously,
   signOut, 
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
   sendPasswordResetEmail,
+  testConnection,
   doc, 
   getDoc, 
   setDoc, 
@@ -33,6 +33,7 @@ import {
   orderBy, 
   onSnapshot, 
   updateDoc,
+  deleteDoc,
   OperationType,
   handleFirestoreError
 } from '../lib/firebase';
@@ -43,9 +44,24 @@ export function getCanonicalPhase(status: string): TrackingPhase {
   return 'ordered'; // 'ordered', 'pending_approval', 'pickup_scheduled'
 }
 
+function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      result[key] = value;
+    }
+  }
+  return result as T;
+}
+
+function clampString(value: string | undefined, maxLen: number): string {
+  return (value || '').trim().slice(0, maxLen);
+}
+
 interface AuthParcelContextType {
   currentUser: UserProfile | null;
   authLoading: boolean;
+  parcelsLoaded: boolean;
   parcels: ParcelItem[];
   userParcels: ParcelItem[];
   analytics: AnalyticsSummary;
@@ -53,14 +69,15 @@ interface AuthParcelContextType {
   signInWithEmail: (email: string, pass: string) => Promise<UserProfile | null>;
   signUpWithEmail: (email: string, pass: string, name: string, phone?: string, businessName?: string) => Promise<UserProfile | null>;
   sendPasswordReset: (email: string) => Promise<void>;
-  demoSignIn: (role: 'admin' | 'team' | 'customer', customEmail?: string, customName?: string) => Promise<UserProfile>;
   logout: () => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
   createParcelBooking: (data: PickupFormData, calculatedFare?: number) => Promise<ParcelItem>;
   updateParcelStatus: (parcelId: string, newStatus: ParcelStatus, note?: string) => Promise<void>;
   approveParcelOrder: (parcelId: string) => Promise<void>;
   markParcelPicked: (parcelId: string) => Promise<void>;
+  markParcelShipped: (parcelId: string) => Promise<void>;
   updateParcelPayment: (parcelId: string, paymentStatus: 'pending' | 'collected') => Promise<void>;
+  deleteParcel: (parcelId: string) => Promise<void>;
   bulkApproveOrders: (parcelIds: string[]) => Promise<void>;
   bulkMarkPicked: (parcelIds: string[]) => Promise<void>;
   getClientReports: (timeframe: 'this_month' | 'past_6_months' | 'yearly' | 'all_time') => ClientReportSummary;
@@ -71,13 +88,14 @@ interface AuthParcelContextType {
 
 const AuthParcelContext = createContext<AuthParcelContextType | undefined>(undefined);
 
-// Admin emails list - app owners and administrators
-const ADMIN_EMAILS = ['joshiakash1712@gmail.com', 'joshiakash1209@gmail.com', 'admin@joshicouriers.com'];
+// Verified administrator emails matching firestore.rules
+const ADMIN_EMAILS = ['joshiakash1712@gmail.com', 'joshiakash1209@gmail.com'];
 
 export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [parcels, setParcels] = useState<ParcelItem[]>([]);
+  const [parcelsLoaded, setParcelsLoaded] = useState<boolean>(false);
 
   // Clear legacy mock data from localStorage to ensure clean state
   useEffect(() => {
@@ -102,37 +120,52 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }
 
       try {
+        await testConnection();
         const userRef = doc(db, 'users', fbUser.uid);
         const snap = await getDoc(userRef);
-        const isOwnerEmail = fbUser.email && ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim());
+        const isVerifiedOwner = Boolean(
+          fbUser.emailVerified &&
+          fbUser.email &&
+          ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim())
+        );
 
         let profile: UserProfile;
         if (snap.exists()) {
           profile = snap.data() as UserProfile;
-          if (isOwnerEmail && profile.role !== 'admin') {
-            profile.role = 'admin';
-            await setDoc(userRef, { role: 'admin' }, { merge: true });
+          if (isVerifiedOwner && profile.role !== 'admin') {
+            profile = { ...profile, role: 'admin' };
+            await updateDoc(userRef, { role: 'admin' });
           }
         } else {
-          profile = {
+          profile = stripUndefined({
             id: fbUser.uid,
-            name: fbUser.displayName || fbUser.email?.split('@')[0] || 'Merchant',
-            email: fbUser.email || undefined,
-            phone: fbUser.phoneNumber || '',
+            name: clampString(fbUser.displayName || fbUser.email?.split('@')[0] || 'Merchant', 120) || 'Merchant',
+            email: fbUser.email ? clampString(fbUser.email, 200) : undefined,
+            phone: clampString(fbUser.phoneNumber || '', 30),
             businessName: '',
             city: 'Jalna',
             defaultAddress: '',
-            role: isOwnerEmail ? 'admin' : 'customer',
-            avatarUrl: fbUser.photoURL || undefined,
+            role: (isVerifiedOwner ? 'admin' : 'customer') as UserRole,
+            avatarUrl: fbUser.photoURL ? clampString(fbUser.photoURL, 1000) : undefined,
             createdAt: new Date().toISOString(),
-          };
+          });
           await setDoc(userRef, profile);
         }
         setCurrentUser(profile);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching/creating user profile:', err);
-        // Fallback profile if Firestore read fails
-        const isOwnerEmail = fbUser.email && ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim());
+        if (err?.code === 'permission-denied') {
+          try {
+            handleFirestoreError(err, OperationType.WRITE, `users/${fbUser.uid}`);
+          } catch {
+            // Logged structured diagnostic info
+          }
+        }
+        const isVerifiedOwner = Boolean(
+          fbUser.emailVerified &&
+          fbUser.email &&
+          ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim())
+        );
         setCurrentUser({
           id: fbUser.uid,
           name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
@@ -140,7 +173,7 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           phone: fbUser.phoneNumber || '',
           city: 'Jalna',
           defaultAddress: '',
-          role: isOwnerEmail ? 'admin' : 'customer',
+          role: isVerifiedOwner ? 'admin' : 'customer',
           createdAt: new Date().toISOString(),
         });
       } finally {
@@ -153,26 +186,17 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Real-time Firestore sync for parcels based on authenticated user role
   useEffect(() => {
-    if (!currentUser) {
+    if (!currentUser || !auth.currentUser) {
       setParcels([]);
+      setParcelsLoaded(false);
       return;
     }
 
-    // Per Firebase Skill: Only attach onSnapshot listeners if auth is ready and user is authenticated
-    if (!auth.currentUser) {
-      return;
-    }
-
-    let q;
+    setParcelsLoaded(false);
     const parcelsCol = collection(db, 'parcels');
-
-    if (currentUser.role === 'admin' || currentUser.role === 'team') {
-      // Admin and logistics team members see all parcels to manage tracking
-      q = query(parcelsCol, orderBy('createdAt', 'desc'));
-    } else {
-      // Regular customer sees their own parcels
-      q = query(parcelsCol, where('userId', '==', currentUser.id));
-    }
+    const q = (currentUser.role === 'admin' || currentUser.role === 'team')
+      ? query(parcelsCol, orderBy('createdAt', 'desc'))
+      : query(parcelsCol, where('userId', '==', auth.currentUser.uid));
 
     const unsubscribe = onSnapshot(
       q, 
@@ -181,11 +205,12 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         snapshot.forEach((docSnap) => {
           loaded.push(docSnap.data() as ParcelItem);
         });
-        // Sort descending by creation
         loaded.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setParcels(loaded);
+        setParcelsLoaded(true);
       },
       (err) => {
+        setParcelsLoaded(true);
         console.warn('Real-time parcels listener notice:', err);
         if ((err as any).code === 'permission-denied') {
           try {
@@ -205,7 +230,11 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const fbUser = result.user;
-      const isOwnerEmail = fbUser.email && ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim());
+      const isVerifiedOwner = Boolean(
+        fbUser.emailVerified &&
+        fbUser.email &&
+        ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim())
+      );
 
       const userRef = doc(db, 'users', fbUser.uid);
       const snap = await getDoc(userRef);
@@ -213,23 +242,23 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       let profile: UserProfile;
       if (snap.exists()) {
         profile = snap.data() as UserProfile;
-        if (isOwnerEmail && profile.role !== 'admin') {
-          profile.role = 'admin';
-          await setDoc(userRef, { role: 'admin' }, { merge: true });
+        if (isVerifiedOwner && profile.role !== 'admin') {
+          profile = { ...profile, role: 'admin' };
+          await updateDoc(userRef, { role: 'admin' });
         }
       } else {
-        profile = {
+        profile = stripUndefined({
           id: fbUser.uid,
-          name: fbUser.displayName || 'Merchant',
-          email: fbUser.email || undefined,
-          phone: fbUser.phoneNumber || '',
+          name: clampString(fbUser.displayName || 'Merchant', 120) || 'Merchant',
+          email: fbUser.email ? clampString(fbUser.email, 200) : undefined,
+          phone: clampString(fbUser.phoneNumber || '', 30),
           businessName: '',
           city: 'Jalna',
           defaultAddress: '',
-          role: isOwnerEmail ? 'admin' : 'customer',
-          avatarUrl: fbUser.photoURL || undefined,
+          role: (isVerifiedOwner ? 'admin' : 'customer') as UserRole,
+          avatarUrl: fbUser.photoURL ? clampString(fbUser.photoURL, 1000) : undefined,
           createdAt: new Date().toISOString(),
-        };
+        });
         await setDoc(userRef, profile);
       }
       setCurrentUser(profile);
@@ -245,7 +274,11 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
       const fbUser = cred.user;
-      const isOwnerEmail = fbUser.email && ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim());
+      const isVerifiedOwner = Boolean(
+        fbUser.emailVerified &&
+        fbUser.email &&
+        ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim())
+      );
 
       const userRef = doc(db, 'users', fbUser.uid);
       const snap = await getDoc(userRef);
@@ -253,17 +286,22 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       let profile: UserProfile;
       if (snap.exists()) {
         profile = snap.data() as UserProfile;
+        if (isVerifiedOwner && profile.role !== 'admin') {
+          profile = { ...profile, role: 'admin' };
+          await updateDoc(userRef, { role: 'admin' });
+        }
       } else {
-        profile = {
+        profile = stripUndefined({
           id: fbUser.uid,
-          name: fbUser.displayName || email.split('@')[0],
-          email: fbUser.email || email,
+          name: clampString(fbUser.displayName || email.split('@')[0], 120) || 'Merchant',
+          email: fbUser.email ? clampString(fbUser.email, 200) : clampString(email, 200),
           phone: '',
+          businessName: '',
           city: 'Jalna',
           defaultAddress: '',
-          role: isOwnerEmail ? 'admin' : 'customer',
+          role: (isVerifiedOwner ? 'admin' : 'customer') as UserRole,
           createdAt: new Date().toISOString(),
-        };
+        });
         await setDoc(userRef, profile);
       }
       setCurrentUser(profile);
@@ -286,20 +324,19 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const cred = await createUserWithEmailAndPassword(auth, email.trim(), pass);
       const fbUser = cred.user;
       
-      await updateProfile(fbUser, { displayName: name });
-      const isOwnerEmail = fbUser.email && ADMIN_EMAILS.includes(fbUser.email.toLowerCase().trim());
+      await updateProfile(fbUser, { displayName: clampString(name, 120) });
 
-      const profile: UserProfile = {
+      const profile: UserProfile = stripUndefined({
         id: fbUser.uid,
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        businessName: businessName.trim(),
+        name: clampString(name, 120) || 'Merchant',
+        email: clampString(email, 200),
+        phone: clampString(phone, 30),
+        businessName: clampString(businessName, 200),
         city: 'Jalna',
         defaultAddress: '',
-        role: isOwnerEmail ? 'admin' : 'customer',
+        role: 'customer' as UserRole,
         createdAt: new Date().toISOString(),
-      };
+      });
 
       await setDoc(doc(db, 'users', fbUser.uid), profile);
       setCurrentUser(profile);
@@ -320,50 +357,6 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  // Instant 1-click test sign-in for preview testing (Admin or Merchant)
-  const demoSignIn = async (role: 'admin' | 'team' | 'customer', customEmail?: string, customName?: string): Promise<UserProfile> => {
-    const isOwner = role === 'admin' || (customEmail && ADMIN_EMAILS.includes(customEmail.toLowerCase().trim()));
-    const isTeam = role === 'team';
-    const profileRole: UserRole = isOwner ? 'admin' : isTeam ? 'team' : 'customer';
-
-    const profile: UserProfile = {
-      id: isOwner ? 'admin-akash-joshi' : isTeam ? 'team-transporter-anant' : 'merchant-anand-patel',
-      name: customName || (isOwner ? 'Akash Joshi' : isTeam ? 'Anant Joshi (Transporter)' : 'Anand Patel'),
-      email: customEmail || (isOwner ? 'joshiakash1712@gmail.com' : isTeam ? 'transporter@joshicouriers.com' : 'anand.patel@jalnatextiles.in'),
-      phone: isOwner ? '+91 94040 40606' : isTeam ? '+91 94222 55566' : '+91 98220 12345',
-      businessName: isOwner 
-        ? 'Joshi Couriers Head Operations' 
-        : isTeam 
-        ? 'Joshi Corridor Fleet (MH21 V 6370)' 
-        : 'Patel Cloth Wholesalers, Jalna',
-      city: 'Jalna',
-      defaultAddress: isOwner 
-        ? 'Station Road, Old Jalna' 
-        : isTeam 
-        ? 'Transport Nagar, Jalna' 
-        : 'Cloth Market, Subhash Road, Jalna',
-      role: profileRole,
-      avatarUrl: isOwner 
-        ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80' 
-        : undefined,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Attempt to persist profile to Firestore if auth user exists
-    try {
-      if (auth.currentUser) {
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        await setDoc(userRef, { ...profile, id: auth.currentUser.uid }, { merge: true });
-        profile.id = auth.currentUser.uid;
-      }
-    } catch (e) {
-      console.warn('Could not persist demo user to firestore:', e);
-    }
-
-    setCurrentUser(profile);
-    return profile;
-  };
-
   const logout = async () => {
     try {
       await signOut(auth);
@@ -375,88 +368,98 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
-    if (!currentUser) return;
+    if (!currentUser || !auth.currentUser) {
+      throw new Error('Authentication required to update profile.');
+    }
+    const { id: _ignoredId, role: _ignoredRole, createdAt: _ignoredCreated, ...mutable } = data;
+    const sanitized = stripUndefined({
+      ...mutable,
+      name: mutable.name !== undefined ? clampString(mutable.name, 120) : undefined,
+      email: mutable.email !== undefined ? clampString(mutable.email, 200) : undefined,
+      phone: mutable.phone !== undefined ? clampString(mutable.phone, 30) : undefined,
+      businessName: mutable.businessName !== undefined ? clampString(mutable.businessName, 200) : undefined,
+      city: mutable.city !== undefined ? clampString(mutable.city, 100) : undefined,
+      defaultAddress: mutable.defaultAddress !== undefined ? clampString(mutable.defaultAddress, 500) : undefined,
+      avatarUrl: mutable.avatarUrl !== undefined ? clampString(mutable.avatarUrl, 1000) : undefined,
+    });
+    if (Object.keys(sanitized).length === 0) return;
+
     try {
-      const userRef = doc(db, 'users', currentUser.id);
-      await setDoc(userRef, data, { merge: true });
-      setCurrentUser(prev => prev ? { ...prev, ...data } : null);
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      await updateDoc(userRef, sanitized);
+      setCurrentUser(prev => prev ? { ...prev, ...sanitized } : null);
     } catch (err: any) {
       console.error('Error updating user profile:', err);
       if (err?.code === 'permission-denied') {
-        try {
-          handleFirestoreError(err, OperationType.UPDATE, `users/${currentUser.id}`);
-        } catch {
-          // Handled and reported
-        }
+        handleFirestoreError(err, OperationType.UPDATE, `users/${auth.currentUser.uid}`);
       }
       throw err;
     }
   };
 
-  // Create real parcel booking in Firestore
+  // Create authenticated parcel booking persisted in Firestore
   const createParcelBooking = async (data: PickupFormData, calculatedFare = 75): Promise<ParcelItem> => {
+    if (!auth.currentUser || !currentUser) {
+      throw new Error('AUTH_REQUIRED');
+    }
+
     const fromLoc = ROUTE_LOCATIONS.find(l => l.id === data.fromLocationId) || ROUTE_LOCATIONS[0];
     const toLoc = ROUTE_LOCATIONS.find(l => l.id === data.toLocationId) || ROUTE_LOCATIONS[ROUTE_LOCATIONS.length - 1];
 
     const randomDigits = Math.floor(10000 + Math.random() * 90000);
     const trackingId = `JC-${randomDigits}`;
 
-    const isStaffUser = currentUser?.role === 'admin' || currentUser?.role === 'team';
-    // When created by client on website, starts in 'pending_approval'
-    // If created directly by staff, starts in 'ordered'
+    const isStaffUser = currentUser.role === 'admin' || currentUser.role === 'team';
     const initialStatus: ParcelStatus = isStaffUser ? 'ordered' : 'pending_approval';
+    const safeFare = Math.max(0, Math.min(Number(calculatedFare) || 75, 50000));
+    const nowIso = new Date().toISOString();
 
-    const newParcel: ParcelItem = {
+    const newParcel: ParcelItem = stripUndefined({
       id: trackingId,
-      userId: currentUser ? currentUser.id : 'guest',
-      senderName: data.senderName || (currentUser ? currentUser.name : 'Sender'),
-      senderPhone: data.senderPhone || (currentUser?.phone || '+91 94040 40606'),
-      senderEmail: currentUser?.email,
-      senderBusiness: currentUser?.businessName,
-      pickupAddress: data.pickupAddress || (currentUser?.defaultAddress || 'Jalna Pickup Location'),
-      fromLocationId: data.fromLocationId,
-      fromCity: fromLoc.name,
-      toLocationId: data.toLocationId,
-      toCity: toLoc.name,
-      receiverName: data.receiverName || 'Receiver in ' + toLoc.name,
-      receiverPhone: data.receiverPhone || '',
-      deliveryAddress: data.deliveryAddress || `${toLoc.name} Delivery Address`,
-      parcelType: data.parcelType,
-      weightCategory: data.weightCategory,
-      notes: data.notes,
-      fare: calculatedFare,
-      paymentMode: 'cash_on_delivery',
-      paymentStatus: 'pending',
+      userId: auth.currentUser.uid,
+      senderName: clampString(data.senderName || currentUser.name, 120) || 'Sender',
+      senderPhone: clampString(data.senderPhone || currentUser.phone || '+91 94040 40606', 30),
+      senderEmail: currentUser.email ? clampString(currentUser.email, 200) : undefined,
+      senderBusiness: currentUser.businessName ? clampString(currentUser.businessName, 200) : undefined,
+      pickupAddress: clampString(data.pickupAddress || currentUser.defaultAddress || 'Jalna Pickup Location', 500),
+      fromLocationId: clampString(data.fromLocationId, 80),
+      fromCity: clampString(fromLoc.name, 100),
+      toLocationId: clampString(data.toLocationId, 80),
+      toCity: clampString(toLoc.name, 100),
+      receiverName: clampString(data.receiverName || `Receiver in ${toLoc.name}`, 120),
+      receiverPhone: clampString(data.receiverPhone || '', 30),
+      deliveryAddress: clampString(data.deliveryAddress || `${toLoc.name} Delivery Address`, 500),
+      parcelType: clampString(data.parcelType, 150),
+      weightCategory: clampString(data.weightCategory, 100),
+      notes: data.notes && data.notes.trim() ? clampString(data.notes, 1000) : undefined,
+      fare: safeFare,
+      paymentMode: 'cash_on_delivery' as const,
+      paymentStatus: 'pending' as const,
       status: initialStatus,
-      createdAt: new Date().toISOString(),
+      createdAt: nowIso,
       scheduledDeliveryDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-      deliverySlot: toLoc.id === 'partur' ? 'Tomorrow 6:30-8:30 AM' : 'Tomorrow 8:30-10:00 AM (via Partur)',
+      deliverySlot: clampString('Tomorrow 6:30-8:30 AM', 120),
       history: [
         {
           status: initialStatus,
-          timestamp: new Date().toISOString(),
+          timestamp: nowIso,
           location: fromLoc.name,
           note: isStaffUser 
             ? 'Parcel order created and approved by logistics team. Scheduled for corridor dispatch.'
-            : `Parcel order request registered online by ${data.senderName}. Awaiting admin confirmation.`,
+            : `Parcel order request registered online by ${clampString(data.senderName, 80)}. Awaiting admin confirmation.`,
         }
       ],
-    };
+    });
 
-    // Save to Firestore
     try {
       await setDoc(doc(db, 'parcels', trackingId), newParcel);
+      setParcels(prev => [newParcel, ...prev.filter(p => p.id !== trackingId)]);
     } catch (err: any) {
-      console.warn('Error saving parcel to Firestore (offline fallback active):', err);
+      console.error('Error saving parcel to Firestore:', err);
       if (err?.code === 'permission-denied') {
-        try {
-          handleFirestoreError(err, OperationType.CREATE, `parcels/${trackingId}`);
-        } catch {
-          // Handled and reported
-        }
+        handleFirestoreError(err, OperationType.CREATE, `parcels/${trackingId}`);
       }
-      // Even if Firestore offline, keep local copy
-      setParcels(prev => [newParcel, ...prev]);
+      throw err;
     }
 
     return newParcel;
@@ -464,6 +467,9 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Update parcel status in Firestore (Admin & Team only)
   const updateParcelStatus = async (parcelId: string, newStatus: ParcelStatus, note?: string) => {
+    if (!auth.currentUser || !currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'team')) {
+      throw new Error('Staff authentication required to update parcel status.');
+    }
     const existing = parcels.find(p => p.id === parcelId);
     if (!existing) return;
 
@@ -486,7 +492,7 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       location: (newStatus === 'shipped' || newStatus === 'delivered' || newStatus === 'arrived_partur') 
         ? existing.toCity 
         : existing.fromCity,
-      note: note || defaultNotes[newStatus] || `Status transitioned to ${newStatus}.`,
+      note: clampString(note || defaultNotes[newStatus] || `Status transitioned to ${newStatus}.`, 500),
     };
 
     const updatedHistory = [...(existing.history || []), newHistoryItem];
@@ -498,20 +504,18 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       history: updatedHistory,
     };
 
-    // Optimistically update local state immediately
+    const previousParcels = parcels;
     setParcels(prev => prev.map(p => p.id === parcelId ? { ...p, ...updates } : p));
 
     try {
       await updateDoc(doc(db, 'parcels', parcelId), updates);
     } catch (err: any) {
-      console.warn('Error updating parcel in Firestore:', err);
+      setParcels(previousParcels);
+      console.error('Error updating parcel in Firestore:', err);
       if (err?.code === 'permission-denied') {
-        try {
-          handleFirestoreError(err, OperationType.UPDATE, `parcels/${parcelId}`);
-        } catch {
-          // Handled and reported
-        }
+        handleFirestoreError(err, OperationType.UPDATE, `parcels/${parcelId}`);
       }
+      throw err;
     }
   };
 
@@ -528,21 +532,42 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const updateParcelPayment = async (parcelId: string, paymentStatus: 'pending' | 'collected') => {
+    if (!auth.currentUser || !currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'team')) {
+      throw new Error('Staff authentication required to update payment status.');
+    }
     const existing = parcels.find(p => p.id === parcelId);
     if (!existing) return;
     const updates = { paymentStatus };
+    const previousParcels = parcels;
     setParcels(prev => prev.map(p => p.id === parcelId ? { ...p, ...updates } : p));
     try {
       await updateDoc(doc(db, 'parcels', parcelId), updates);
     } catch (err: any) {
-      console.warn('Error updating parcel payment status:', err);
+      setParcels(previousParcels);
+      console.error('Error updating parcel payment status:', err);
       if (err?.code === 'permission-denied') {
-        try {
-          handleFirestoreError(err, OperationType.UPDATE, `parcels/${parcelId}`);
-        } catch {
-          // Handled and reported
-        }
+        handleFirestoreError(err, OperationType.UPDATE, `parcels/${parcelId}`);
       }
+      throw err;
+    }
+  };
+
+  // Permanently delete parcel record (Strictly Admin only)
+  const deleteParcel = async (parcelId: string) => {
+    if (!auth.currentUser || currentUser?.role !== 'admin') {
+      throw new Error('Only a verified administrator can delete parcel records.');
+    }
+    const previousParcels = parcels;
+    setParcels(prev => prev.filter(p => p.id !== parcelId));
+    try {
+      await deleteDoc(doc(db, 'parcels', parcelId));
+    } catch (err: any) {
+      setParcels(previousParcels);
+      console.error('Error deleting parcel from Firestore:', err);
+      if (err?.code === 'permission-denied') {
+        handleFirestoreError(err, OperationType.DELETE, `parcels/${parcelId}`);
+      }
+      throw err;
     }
   };
 
@@ -566,19 +591,28 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const cleanId = parcelId.trim().toUpperCase();
     if (!cleanId) return null;
 
-    // Check in-memory parcels state first
     const local = parcels.find(p => p.id.toUpperCase() === cleanId);
     if (local) return local;
 
-    // Fetch directly from Firestore (permitted by public read rule: allow get: if true;)
+    if (!auth.currentUser) {
+      return null;
+    }
+
     try {
       const docRef = doc(db, 'parcels', cleanId);
       const snap = await getDoc(docRef);
       if (snap.exists()) {
         return snap.data() as ParcelItem;
       }
-    } catch (err) {
-      console.warn('Direct tracking fetch error (fallback to local state):', err);
+    } catch (err: any) {
+      console.warn('Direct tracking fetch error:', err);
+      if (err?.code === 'permission-denied') {
+        try {
+          handleFirestoreError(err, OperationType.GET, `parcels/${cleanId}`);
+        } catch {
+          // Reported
+        }
+      }
     }
     return null;
   };
@@ -593,10 +627,14 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return () => {};
     }
 
-    // Immediately push local cached version if present
     const local = parcels.find(p => p.id.toUpperCase() === cleanId);
     if (local) {
       onUpdate(local);
+    }
+
+    if (!auth.currentUser) {
+      onUpdate(local || null);
+      return () => {};
     }
 
     try {
@@ -613,6 +651,13 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         },
         (err) => {
           console.warn('Real-time tracking listener notice:', err);
+          if ((err as any).code === 'permission-denied') {
+            try {
+              handleFirestoreError(err, OperationType.GET, `parcels/${cleanId}`);
+            } catch {
+              // Reported
+            }
+          }
           const fallbackLocal = parcels.find(p => p.id.toUpperCase() === cleanId);
           onUpdate(fallbackLocal || null);
         }
@@ -646,33 +691,11 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     });
   }, [currentUser, parcels]);
 
-  // Synchronize and claim guest orders placed on website when customer logs in with phone or email
-  useEffect(() => {
-    if (!currentUser || currentUser.role === 'admin' || currentUser.role === 'team') return;
-    const cleanUserPhone = currentUser.phone ? currentUser.phone.replace(/\D/g, '').slice(-10) : '';
-    const cleanUserEmail = currentUser.email ? currentUser.email.toLowerCase().trim() : '';
-
-    parcels.forEach(async (p) => {
-      if (p.userId === 'guest') {
-        const cleanSender = p.senderPhone ? p.senderPhone.replace(/\D/g, '').slice(-10) : '';
-        const isMatch = (cleanUserPhone && cleanSender === cleanUserPhone) ||
-          (cleanUserEmail && p.senderEmail && p.senderEmail.toLowerCase().trim() === cleanUserEmail);
-        if (isMatch) {
-          try {
-            await updateDoc(doc(db, 'parcels', p.id), { userId: currentUser.id });
-          } catch {
-            // Ignored if permissions not yet refreshed
-          }
-        }
-      }
-    });
-  }, [currentUser?.id, currentUser?.phone, currentUser?.email, parcels]);
-
   // Compute Client Reports (Monthly, 6 Months, Yearly, All Time)
   const getClientReports = (timeframe: 'this_month' | 'past_6_months' | 'yearly' | 'all_time'): ClientReportSummary => {
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-indexed
+    const currentMonth = now.getMonth();
 
     let filtered = userParcels;
     let label = 'All-Time Deliveries';
@@ -746,21 +769,21 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       pickedCount,
       shippedCount,
       monthlyTrend: Array.from(trendMap.values()),
+      ordersInPeriod: filtered,
     };
   };
 
   // Compute live analytics summary from real database records
   const analytics = React.useMemo<AnalyticsSummary>(() => {
     const totalParcels = parcels.length;
-    const activeParcels = parcels.filter(p => p.status !== 'delivered').length;
-    const deliveredParcels = parcels.filter(p => p.status === 'delivered').length;
+    const activeParcels = parcels.filter(p => p.status !== 'delivered' && p.status !== 'shipped').length;
+    const deliveredParcels = parcels.filter(p => p.status === 'delivered' || p.status === 'shipped').length;
     
     const totalRevenue = parcels.reduce((sum, p) => sum + (p.fare || 0), 0);
     const revenueCollected = parcels.filter(p => p.paymentStatus === 'collected').reduce((sum, p) => sum + (p.fare || 0), 0);
     const revenuePending = totalRevenue - revenueCollected;
     const averageFare = totalParcels > 0 ? Math.round(totalRevenue / totalParcels) : 75;
 
-    // Route breakdown
     const routeMap = new Map<string, { count: number; revenue: number }>();
     parcels.forEach(p => {
       const key = `${p.fromCity} ➔ ${p.toCity}`;
@@ -773,13 +796,12 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       revenue: val.revenue,
     }));
 
-    // Category breakdown
     const catMap = new Map<string, number>();
     parcels.forEach(p => {
       let cat = 'General / Documents';
       const type = (p.parcelType || '').toLowerCase();
-      if (type.includes('textil') || type.includes('cloth') || type.includes('saree')) {
-        cat = 'Textiles & Sarees';
+      if (type.includes('textil') || type.includes('cloth') || type.includes('saree') || type.includes('garment')) {
+        cat = 'Textiles & Garments';
       } else if (type.includes('pharma') || type.includes('medic')) {
         cat = 'Pharma & Medical';
       } else if (type.includes('auto') || type.includes('tractor') || type.includes('bearing') || type.includes('part')) {
@@ -821,7 +843,7 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       averageFare,
       revenueCollected,
       revenuePending,
-      onTimeRatePercent: 100, // 6:30-8:30 AM arrival record
+      onTimeRatePercent: 100,
       routeBreakdown,
       categoryBreakdown,
       statusBreakdown,
@@ -833,6 +855,7 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       value={{
         currentUser,
         authLoading,
+        parcelsLoaded,
         parcels,
         userParcels,
         analytics,
@@ -840,7 +863,6 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         signInWithEmail,
         signUpWithEmail,
         sendPasswordReset,
-        demoSignIn,
         logout,
         updateUserProfile,
         createParcelBooking,
@@ -849,6 +871,7 @@ export const AuthParcelProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         markParcelPicked,
         markParcelShipped,
         updateParcelPayment,
+        deleteParcel,
         bulkApproveOrders,
         bulkMarkPicked,
         getClientReports,

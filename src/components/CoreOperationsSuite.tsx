@@ -34,7 +34,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
   const [calcCategory, setCalcCategory] = useState<'docs' | 'pharma' | 'retail' | 'parts' | 'food'>('docs');
   const [calcWeight, setCalcWeight] = useState<string>('0.5-1kg');
   const [calcFromId, setCalcFromId] = useState<string>('jalna');
-  const [calcToId, setCalcToId] = useState<string>('mantha');
+  const [calcToId, setCalcToId] = useState<string>('partur');
 
   // Tracking State
   const [trackingId, setTrackingId] = useState<string>('JC-7041');
@@ -51,17 +51,17 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
     steps: { title: string; location: string; time: string; done: boolean; current?: boolean }[];
   }> = {
     'JC-7041': {
-      route: 'Jalna ➔ Watur ➔ Mantha',
+      route: 'Jalna ➔ Watur ➔ Partur',
       sender: 'Khandelwal Medicals, Jalna',
-      receiver: 'Deshmukh Clinic, Mantha Market',
+      receiver: 'Deshmukh Clinic, Partur Market',
       item: 'Urgent Diagnostic Samples & Pharma Pack',
-      status: 'Out for Doorstep Delivery in Mantha',
+      status: 'Out for Doorstep Delivery in Partur',
       progressPercent: 85,
       steps: [
         { title: 'Doorstep Pickup Completed', location: 'Station Road Hub, Jalna', time: '09:45 AM', done: true },
-        { title: 'Highway Express Transit', location: 'NH-752I (Via Watur Phata & Belora)', time: '10:45 AM', done: true },
-        { title: 'Arrived at Mantha Hub', location: 'Main Bus Stand Center, Mantha', time: '11:45 AM', done: true },
-        { title: 'Out for Final Handover', location: 'Mantha Bazaar / Clinic Line', time: 'In Progress (ETA 12:15 PM)', done: false, current: true },
+        { title: 'Highway Express Transit', location: 'NH-752I (Via Viregaon & Watur Phata)', time: '10:45 AM', done: true },
+        { title: 'Arrived at Partur Hub', location: 'Main Bus Stand Center, Partur', time: '11:45 AM', done: true },
+        { title: 'Out for Final Handover', location: 'Partur Bazaar / Clinic Line', time: 'In Progress (ETA 12:15 PM)', done: false, current: true },
       ],
     },
     'JC-8820': {
@@ -78,16 +78,16 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
       ],
     },
     'JC-1099': {
-      route: 'Jalna ➔ Wazar Sarkate',
+      route: 'Jalna ➔ Watur Phata',
       sender: 'Mahavir Auto Spares, MIDC Jalna',
-      receiver: 'Kisan Agro Center, Wazar Sarkate',
+      receiver: 'Kisan Agro Center, Watur Phata',
       item: 'Tractor Hydraulic Pump Spare (8.5 kg)',
       status: 'Scheduled for Afternoon Run',
       progressPercent: 30,
       steps: [
         { title: 'Booking Logged & Tagged', location: 'Jalna Hub Desk', time: 'Today 11:10 AM', done: true },
         { title: 'Pickup Assigned to Driver', location: 'MIDC Phase II, Jalna', time: 'Pickup Slot: 01:30 PM', done: false, current: true },
-        { title: 'Afternoon Corridor Dispatch', location: 'Departing 03:30 PM', time: 'ETA Wazar 04:35 PM', done: false },
+        { title: 'Afternoon Corridor Dispatch', location: 'Departing 03:30 PM', time: 'ETA Watur Phata 04:35 PM', done: false },
       ],
     },
   };
@@ -151,7 +151,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
               Daily Corridor Management
             </h2>
             <p className="text-sm sm:text-base text-slate-400 mt-1 max-w-xl">
-              Daily run timetable, instant village-to-city rate calculator, and direct parcel tracking across all 15 stops.
+              Daily run timetable, instant village-to-city rate calculator, and direct parcel tracking across all {ROUTE_LOCATIONS.length} stops.
             </p>
           </div>
 
@@ -220,7 +220,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                         Morning Express Run (10:30 AM Dispatch)
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        Jalna ➔ Sindhi Kalegaon ➔ Viregaon ➔ Watur ➔ Partur ➔ Mantha
+                        Jalna ➔ Sindhi Kalegaon ➔ Viregaon ➔ Watur ➔ Partur
                       </p>
                     </div>
                   </div>
@@ -230,7 +230,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                     <span className="text-sm font-extrabold text-[#EF8E01]">09:30 AM (Same Day)</span>
                     <div className="mt-2">
                       <button
-                        onClick={() => onOpenBooking('jalna', 'mantha')}
+                        onClick={() => onOpenBooking('jalna', 'partur')}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EF8E01] hover:bg-[#d88001] text-white rounded-lg text-xs font-semibold shadow-sm transition-colors"
                       >
                         <span>Book Morning Slot</span>
@@ -243,11 +243,11 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                 <div className="mt-4 pt-4 border-t border-slate-700/60 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-300">
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase">Route</span>
-                    <span className="font-semibold text-white">NH-752I (65 km)</span>
+                    <span className="font-semibold text-white">NH-752I (50 km)</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase">Stops Covered</span>
-                    <span className="font-semibold text-white">All 15 Villages/Hubs</span>
+                    <span className="font-semibold text-white">All {ROUTE_LOCATIONS.length} Villages/Hubs</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase">Transit Time</span>
@@ -279,7 +279,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                         Afternoon Commercial Run (03:30 PM Dispatch)
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        Covers Jalna MIDC ➔ Watur Phata ➔ Belora ➔ Wazar ➔ Mantha
+                        Covers Jalna MIDC ➔ Viregaon ➔ Watur Phata ➔ Partur
                       </p>
                     </div>
                   </div>
@@ -289,7 +289,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                     <span className="text-sm font-extrabold text-[#EF8E01]">02:30 PM (Same Day)</span>
                     <div className="mt-2">
                       <button
-                        onClick={() => onOpenBooking('jalna', 'mantha')}
+                        onClick={() => onOpenBooking('jalna', 'partur')}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0038BD] hover:bg-[#002d99] text-white rounded-lg text-xs font-semibold shadow-sm transition-colors border border-blue-400/30"
                       >
                         <span>Book Afternoon Slot</span>
@@ -306,7 +306,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase">Coverage</span>
-                    <span className="font-semibold text-white">All 3 Talukas &amp; APMC</span>
+                    <span className="font-semibold text-white">Jalna &amp; Partur APMC</span>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase">Weight Limit</span>
@@ -323,7 +323,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
               <div className="bg-slate-800/40 rounded-2xl p-4 sm:p-5 border border-slate-700/60 text-xs text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-slate-300">
                   <MapPin className="w-4 h-4 text-[#EF8E01] shrink-0" />
-                  <span><strong>Return Direction (Mantha / Partur ➔ Jalna):</strong> Daily dispatches at <strong>12:30 PM</strong> and <strong>05:30 PM</strong>.</span>
+                  <span><strong>Return Direction (Partur ➔ Jalna):</strong> Daily dispatches at <strong>12:30 PM</strong> and <strong>05:30 PM</strong>.</span>
                 </div>
                 <span className="text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-1 rounded">Daily Bidirectional</span>
               </div>
@@ -342,12 +342,12 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
               <div className="space-y-3">
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/60">
                   <span className="text-[11px] text-slate-400 block">Total Corridor Span</span>
-                  <span className="text-xl font-extrabold text-white">65 Kilometers</span>
-                  <span className="text-xs text-slate-500 block mt-0.5">Jalna ➔ Watur ➔ Partur ➔ Mantha</span>
+                  <span className="text-xl font-extrabold text-white">50 Kilometers</span>
+                  <span className="text-xs text-slate-500 block mt-0.5">Jalna ➔ Viregaon ➔ Watur ➔ Partur</span>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/60">
-                  <span className="text-[11px] text-slate-400 block">15 Verified Delivery Points</span>
+                  <span className="text-[11px] text-slate-400 block">{ROUTE_LOCATIONS.length} Verified Delivery Points</span>
                   <span className="text-sm font-bold text-white">Full Doorstep Reach</span>
                   <span className="text-xs text-emerald-400 block mt-0.5">Zero central warehouse rerouting</span>
                 </div>

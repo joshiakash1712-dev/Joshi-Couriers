@@ -93,7 +93,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
             Tailored Courier Services for Every Need
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-2">
-            Whether for Jalna commercial markets, Partur retail shops, or Mantha clinics, we handle every parcel with dedicated care.
+            Whether for Jalna commercial markets or Partur retail shops and clinics, we handle every parcel with dedicated care.
           </p>
         </motion.div>
 
@@ -185,7 +185,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
                 Merchant Contract &amp; Daily Account
               </h3>
               <p className="text-xs sm:text-sm text-blue-100 leading-relaxed mt-2">
-                Do you ship daily between Jalna wholesale markets and Partur/Mantha retail shops? Get priority slots and monthly consolidated billing.
+                Do you ship daily between Jalna wholesale markets and Partur retail shops? Get priority slots and monthly consolidated billing.
               </p>
             </div>
 

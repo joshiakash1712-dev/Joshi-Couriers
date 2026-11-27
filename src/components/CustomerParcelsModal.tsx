@@ -21,9 +21,12 @@ import {
   Calendar,
   FileSpreadsheet,
   TrendingUp,
-  Download
+  Download,
+  Bell,
+  BellOff
 } from 'lucide-react';
 import { useAuthParcel } from '../context/AuthParcelContext';
+import { useParcelNotifications } from '../context/NotificationContext';
 import { useToast } from '../hooks/useToast';
 import { ParcelItem, ParcelStatus } from '../types';
 
@@ -41,6 +44,8 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
   onOpenAuth,
 }) => {
   const { currentUser, userParcels, logout, getClientReports } = useAuthParcel();
+  const { isSupported, permission, alertsEnabled, toggleAlerts } = useParcelNotifications();
+  const isAlertsActive = isSupported && permission === 'granted' && alertsEnabled;
   const toast = useToast();
   const [viewMode, setViewMode] = useState<'consignments' | 'reports'>('consignments');
   const [reportTimeframe, setReportTimeframe] = useState<'this_month' | 'past_6_months' | 'yearly' | 'all_time'>('this_month');
@@ -274,17 +279,37 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
           )}
 
           {currentUser && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2.5">
+              {isSupported && (
+                <button
+                  type="button"
+                  onClick={toggleAlerts}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer min-h-[34px] ${
+                    isAlertsActive
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                      : 'bg-white dark:bg-slate-800 text-[#0038BD] dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100/60 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {isAlertsActive ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+                  <span>
+                    {isAlertsActive
+                      ? 'Browser Alerts On'
+                      : permission === 'denied'
+                      ? 'Alerts Blocked in Browser'
+                      : 'Enable Delivery Alerts'}
+                  </span>
+                </button>
+              )}
               <button
                 onClick={onOpenAuth}
-                className="text-xs font-bold text-[#0038BD] dark:text-blue-400 hover:underline"
+                className="text-xs font-bold text-[#0038BD] dark:text-blue-400 hover:underline cursor-pointer"
               >
                 Switch Account
               </button>
               <span className="text-slate-300 dark:text-slate-600">•</span>
               <button
                 onClick={logout}
-                className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline"
+                className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline cursor-pointer"
               >
                 Log Out
               </button>
@@ -332,7 +357,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                 <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 mt-0.5 block">
                   {userParcels.length}
                 </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500">Jalna ➔ Partur/Mantha</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500">Jalna ➔ Partur</span>
               </div>
 
               <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-amber-200 dark:border-amber-800/60 shadow-2xs">
@@ -867,7 +892,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
               <div className="flex items-center gap-2">
                 <Truck className="w-4 h-4 text-[#0038BD] shrink-0" />
                 <span>
-                  All consignments delivered on the Jalna ➔ Partur (6:30-8:30 AM) &amp; Mantha morning run in Mahindra Maxximo MH21 V 6370.
+                  All consignments delivered on the Jalna ➔ Partur (6:30-8:30 AM) morning run in Mahindra Maxximo MH21 V 6370.
                 </span>
               </div>
               <button
@@ -884,7 +909,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
         {/* Footer info */}
         <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
           <p>
-            Daily Morning Delivery: <strong className="text-slate-800 dark:text-slate-200">Partur 6:30 - 8:30 AM</strong> • Mantha 8:30 - 10:00 AM.
+            Daily Morning Delivery: <strong className="text-slate-800 dark:text-slate-200">Jalna ➔ Partur (6:30 - 8:30 AM)</strong>.
           </p>
           <a
             href="tel:+919404040606"

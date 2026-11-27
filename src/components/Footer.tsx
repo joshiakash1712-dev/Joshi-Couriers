@@ -38,11 +38,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
             </div>
 
             <p className="text-sm text-blue-100/90 leading-relaxed max-w-sm">
-              Business-focused local courier run personally by father &amp; son. We pickup daily in Jalna, ship to Partur next morning (6:30-8:30 AM), and connect up to Mantha through trusted partners.
+              Business-focused local courier run personally by father &amp; son. We pickup daily in Jalna and ship directly to Partur next morning (6:30-8:30 AM).
             </p>
 
             <div className="pt-1 text-xs text-blue-200 font-medium">
-              <span>Jalna ➔ Partur ➔ Mantha Corridor</span>
+              <span>Jalna ➔ Partur Corridor</span>
             </div>
           </div>
 
@@ -116,7 +116,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
                 <div>
                   <strong className="text-white block font-bold">6:30 - 8:30 AM</strong>
-                  <span>Deliveries &amp; Mantha</span>
+                  <span>Partur Doorstep Drop</span>
                 </div>
               </li>
             </ul>
@@ -161,7 +161,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
         </div>
 
         <div className="mt-10 pt-6 border-t border-blue-900/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-blue-300">
-          <p>© {new Date().getFullYear()} Joshi Couriers. All rights reserved. Jalna • Partur • Mantha.</p>
+          <p>© {new Date().getFullYear()} Joshi Couriers. All rights reserved. Jalna • Partur.</p>
           <p className="font-semibold text-blue-200">Handled personally by father &amp; son team.</p>
         </div>
       </div>

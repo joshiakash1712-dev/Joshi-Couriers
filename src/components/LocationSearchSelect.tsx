@@ -57,7 +57,7 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTaluka, setSelectedTaluka] = useState<'all' | 'Jalna' | 'Partur' | 'Mantha'>('all');
+  const [selectedTaluka, setSelectedTaluka] = useState<'all' | 'Jalna' | 'Partur'>('all');
   const [highlightedIndex, setHighlightedIndex] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -161,7 +161,7 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
     }
   };
 
-  const talukas: Array<'all' | 'Jalna' | 'Partur' | 'Mantha'> = ['all', 'Jalna', 'Partur', 'Mantha'];
+  const talukas: Array<'all' | 'Jalna' | 'Partur'> = ['all', 'Jalna', 'Partur'];
 
   return (
     <div className="relative flex-1" ref={containerRef}>
@@ -239,7 +239,7 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
 
         <div className="flex items-center gap-1.5 shrink-0 pl-1">
           <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-700/60 px-1.5 py-0.5 rounded-md hidden sm:inline">
-            15 stops
+            {ROUTE_LOCATIONS.length} stops
           </span>
           <ChevronDown
             className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${

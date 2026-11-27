@@ -19,10 +19,10 @@ interface InteractiveRouteVisualProps {
 }
 
 export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ onSelectLocation }) => {
-  const [direction, setDirection] = useState<'jalna-to-mantha' | 'mantha-to-jalna'>('jalna-to-mantha');
+  const [direction, setDirection] = useState<'jalna-to-partur' | 'partur-to-jalna'>('jalna-to-partur');
   const [selectedHub, setSelectedHub] = useState<string>('jalna');
 
-  const isJalnaOrigin = direction === 'jalna-to-mantha';
+  const isJalnaOrigin = direction === 'jalna-to-partur';
   const activeLocation = ROUTE_LOCATIONS.find(l => l.id === selectedHub) || ROUTE_LOCATIONS[0];
 
   return (
@@ -34,20 +34,20 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#0038BD] bg-[#0038BD]/10 px-2.5 py-1 rounded-md inline-flex items-center gap-1">
               <Navigation className="w-3 h-3 text-[#0038BD]" />
-              CORRIDOR NH-752I &amp; SH-176
+              CORRIDOR NH-752I
             </span>
             <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
               <Compass className="w-3 h-3 text-[#EF8E01]" />
-              65 KM REGIONAL EXPRESS
+              50 KM REGIONAL EXPRESS
             </span>
           </div>
           <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-1.5 flex items-center gap-2">
-            <span>{isJalnaOrigin ? 'Jalna City ➔ Watur ➔ Partur ➔ Mantha' : 'Mantha ➔ Partur ➔ Watur ➔ Jalna City'}</span>
+            <span>{isJalnaOrigin ? 'Jalna City ➔ Viregaon ➔ Watur ➔ Partur' : 'Partur ➔ Watur ➔ Viregaon ➔ Jalna City'}</span>
           </h3>
         </div>
 
         <button
-          onClick={() => setDirection(isJalnaOrigin ? 'mantha-to-jalna' : 'jalna-to-mantha')}
+          onClick={() => setDirection(isJalnaOrigin ? 'partur-to-jalna' : 'jalna-to-partur')}
           id="toggle-route-direction-btn"
           className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-[#0038BD] hover:text-white rounded-xl transition-all border border-slate-200 shadow-2xs active:scale-95 shrink-0"
         >
@@ -62,11 +62,11 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
         {/* Geographic Coordinates & Corridor Status Header */}
         <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono mb-4 uppercase tracking-wider">
           <span>LAT 19.8347° N (Jalna)</span>
-          <span className="text-[#0038BD] font-bold">15 PICKUP &amp; DELIVERY HUBS</span>
-          <span>LAT 19.5312° N (Mantha)</span>
+          <span className="text-[#0038BD] font-bold">{ROUTE_LOCATIONS.length} PICKUP &amp; DELIVERY HUBS</span>
+          <span>LAT 19.5892° N (Partur)</span>
         </div>
 
-        {/* Node Waypoints Bar (Jalna -> Watur -> Partur -> Mantha) */}
+        {/* Node Waypoints Bar (Jalna -> Viregaon -> Watur -> Partur) */}
         <div className="grid grid-cols-4 gap-2 text-center relative py-2">
           {/* Track Line behind */}
           <div className="absolute top-7 left-8 right-8 h-1 bg-gradient-to-r from-[#0038BD] via-[#EF8E01] to-[#0038BD] rounded-full -z-0 opacity-70" />
@@ -85,7 +85,21 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
             <span className="text-[10px] text-slate-500 font-bold">Origin (0 km)</span>
           </div>
 
-          {/* 2. Watur Phata */}
+          {/* 2. Viregaon */}
+          <div 
+            className="flex flex-col items-center cursor-pointer relative z-10 group"
+            onClick={() => setSelectedHub('viregaon')}
+          >
+            <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all ${
+              selectedHub === 'viregaon' ? 'bg-[#EF8E01] text-white ring-4 ring-orange-500/20 scale-105' : 'bg-white text-slate-700 border border-slate-300 shadow-2xs'
+            }`}>
+              <MapPin className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-black text-slate-900 mt-1.5">Viregaon</span>
+            <span className="text-[10px] text-slate-500 font-bold">Stop (30 km)</span>
+          </div>
+
+          {/* 3. Watur Phata */}
           <div 
             className="flex flex-col items-center cursor-pointer relative z-10 group"
             onClick={() => setSelectedHub('watur-phata')}
@@ -99,32 +113,18 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
             <span className="text-[10px] text-slate-500 font-bold">Junction (38 km)</span>
           </div>
 
-          {/* 3. Partur */}
+          {/* 4. Partur */}
           <div 
             className="flex flex-col items-center cursor-pointer relative z-10 group"
             onClick={() => setSelectedHub('partur')}
           >
             <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all ${
-              selectedHub === 'partur' ? 'bg-[#EF8E01] text-white ring-4 ring-orange-500/20 scale-105' : 'bg-white text-slate-700 border border-slate-300 shadow-2xs'
+              selectedHub === 'partur' ? 'bg-[#0038BD] text-white ring-4 ring-blue-500/20 scale-105' : 'bg-white text-slate-700 border border-slate-300 shadow-2xs'
             }`}>
               <MapPin className="w-5 h-5" />
             </div>
             <span className="text-xs font-black text-slate-900 mt-1.5">Partur</span>
-            <span className="text-[10px] text-slate-500 font-bold">Taluka (50 km)</span>
-          </div>
-
-          {/* 4. Mantha */}
-          <div 
-            className="flex flex-col items-center cursor-pointer relative z-10 group"
-            onClick={() => setSelectedHub('mantha')}
-          >
-            <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all ${
-              selectedHub === 'mantha' ? 'bg-[#0038BD] text-white ring-4 ring-blue-500/20 scale-105' : 'bg-white text-slate-700 border border-slate-300 shadow-2xs'
-            }`}>
-              <MapPin className="w-5 h-5" />
-            </div>
-            <span className="text-xs font-black text-slate-900 mt-1.5">Mantha</span>
-            <span className="text-[10px] text-slate-500 font-bold">Terminus (65 km)</span>
+            <span className="text-[10px] text-slate-500 font-bold">Terminus (50 km)</span>
           </div>
         </div>
 
@@ -138,7 +138,7 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
           </div>
           {onSelectLocation && (
             <button
-              onClick={() => onSelectLocation(activeLocation.id, activeLocation.id === 'jalna' ? 'mantha' : 'jalna')}
+              onClick={() => onSelectLocation(activeLocation.id, activeLocation.id === 'jalna' ? 'partur' : 'jalna')}
               className="text-[11px] font-bold text-[#0038BD] hover:text-[#EF8E01] flex items-center gap-1"
             >
               <span>Book from {activeLocation.name}</span>
@@ -159,7 +159,7 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
               <span className="font-bold text-slate-900">Run 1: Morning Run</span>
               <span className="text-[10px] font-bold text-[#0038BD] bg-blue-50 px-1.5 py-0.2 rounded border border-blue-200">10:30 AM</span>
             </div>
-            <p className="text-slate-500 mt-0.5">Jalna ➔ Watur ➔ Partur ➔ Mantha</p>
+            <p className="text-slate-500 mt-0.5">Jalna ➔ Viregaon ➔ Watur ➔ Partur</p>
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
               <span className="font-bold text-slate-900">Run 2: Afternoon Run</span>
               <span className="text-[10px] font-bold text-[#EF8E01] bg-orange-50 px-1.5 py-0.2 rounded border border-orange-200">03:30 PM</span>
             </div>
-            <p className="text-slate-500 mt-0.5">Jalna ➔ Watur ➔ Partur ➔ Mantha</p>
+            <p className="text-slate-500 mt-0.5">Jalna ➔ Viregaon ➔ Watur ➔ Partur</p>
           </div>
         </div>
       </div>
@@ -181,7 +181,7 @@ export const InteractiveRouteVisual: React.FC<InteractiveRouteVisualProps> = ({ 
       <div className="mt-3 flex items-center justify-between text-xs text-slate-600 bg-[#0038BD]/5 rounded-xl px-3.5 py-2 border border-[#0038BD]/10">
         <div className="flex items-center gap-1.5 text-[#0038BD] font-semibold text-[11px]">
           <ShieldCheck className="w-3.5 h-3.5 text-[#0038BD]" />
-          <span>Doorstep Courier Service across All 15 Route Stops</span>
+          <span>Doorstep Courier Service across All {ROUTE_LOCATIONS.length} Route Stops</span>
         </div>
         <span className="text-[10px] font-bold text-slate-800">Zero Advance • Pay on Delivery</span>
       </div>

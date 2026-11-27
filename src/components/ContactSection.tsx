@@ -61,13 +61,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
               </h2>
 
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                Contact us today for fast and hassle-free daily delivery between Jalna, Partur, and Mantha across all 15 stops.
+                Contact us today for fast and hassle-free daily delivery between Jalna and Partur across all 9 stops.
               </p>
 
               {/* Green Bordered WhatsApp Pill Button from Reference 1 */}
               <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
                 <a
-                  href="https://wa.me/919404040606?text=Hi%20Joshi%20Couriers,%20I%20want%20to%20send%20a%20parcel%20on%20the%20Jalna-Partur-Mantha%20route."
+                  href="https://wa.me/919404040606?text=Hi%20Joshi%20Couriers,%20I%20want%20to%20send%20a%20parcel%20on%20the%20Jalna-Partur%20route."
                   target="_blank"
                   rel="noopener noreferrer"
                   id="contact-section-whatsapp-btn"
@@ -134,7 +134,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
                   <span className="text-sm sm:text-base font-bold text-slate-900 block">
                     Jalna, Maharashtra, India
                   </span>
-                  <span className="text-xs text-slate-500">Connecting 15 Hubs: Jalna ↔ Partur ↔ Mantha</span>
+                  <span className="text-xs text-slate-500">Connecting 9 Hubs: Jalna ↔ Watur ↔ Partur</span>
                 </div>
               </div>
             </div>

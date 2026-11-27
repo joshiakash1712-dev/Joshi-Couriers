@@ -6,13 +6,31 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 3 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isVerifiedAdminEmail() {
+      return isSignedIn() &&
+        request.auth.token.email_verified == true &&
+        request.auth.token.email in ['joshiakash1712@gmail.com', 'joshiakash1209@gmail.com'];
+    }
+
     function isAdmin() {
       return isSignedIn() && (
-        request.auth.token.email in ['joshiakash1712@gmail.com', 'joshiakash1209@gmail.com'] ||
+        isVerifiedAdminEmail() ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
@@ -29,32 +47,142 @@ service cloud.firestore {
     function isSenderOrReceiver(parcel) {
       return isSignedIn() && (
         parcel.userId == request.auth.uid ||
-        (parcel.senderEmail != null && parcel.senderEmail == request.auth.token.email) ||
-        (parcel.receiverEmail != null && parcel.receiverEmail == request.auth.token.email)
+        (request.auth.token.email_verified == true && 'senderEmail' in parcel && parcel.senderEmail == request.auth.token.email) ||
+        (request.auth.token.email_verified == true && 'receiverEmail' in parcel && parcel.receiverEmail == request.auth.token.email)
       );
     }
 
-    // Connection test document
+    function isValidUser(data) {
+      return data.keys().hasOnly([
+          'id', 'name', 'email', 'phone', 'businessName',
+          'city', 'defaultAddress', 'role', 'avatarUrl', 'createdAt'
+        ]) &&
+        data.keys().hasAll(['id', 'name', 'role', 'createdAt']) &&
+        isValidId(data.id) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+        data.createdAt is string && data.createdAt.size() >= 10 && data.createdAt.size() <= 40 &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 200)) &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 30)) &&
+        (!('businessName' in data) || (data.businessName is string && data.businessName.size() <= 200)) &&
+        (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
+        (!('defaultAddress' in data) || (data.defaultAddress is string && data.defaultAddress.size() <= 500)) &&
+        (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 1000)) &&
+        data.role in ['customer', 'admin', 'team'];
+    }
+
+    function isValidParcel(data) {
+      return data.keys().hasOnly([
+          'id', 'userId', 'senderName', 'senderPhone', 'senderEmail', 'senderBusiness',
+          'pickupAddress', 'fromLocationId', 'fromCity', 'toLocationId', 'toCity',
+          'receiverName', 'receiverPhone', 'receiverEmail', 'deliveryAddress',
+          'parcelType', 'weightCategory', 'notes', 'fare', 'paymentMode',
+          'paymentStatus', 'status', 'createdAt', 'scheduledDeliveryDate',
+          'deliverySlot', 'history'
+        ]) &&
+        data.keys().hasAll([
+          'id', 'userId', 'senderName', 'senderPhone', 'pickupAddress',
+          'fromLocationId', 'fromCity', 'toLocationId', 'toCity',
+          'receiverName', 'receiverPhone', 'deliveryAddress',
+          'parcelType', 'weightCategory', 'fare', 'paymentMode',
+          'paymentStatus', 'status', 'createdAt', 'scheduledDeliveryDate',
+          'deliverySlot', 'history'
+        ]) &&
+        isValidId(data.id) &&
+        isValidId(data.userId) &&
+        data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 120 &&
+        data.senderPhone is string && data.senderPhone.size() <= 30 &&
+        (!('senderEmail' in data) || (data.senderEmail is string && data.senderEmail.size() <= 200)) &&
+        (!('senderBusiness' in data) || (data.senderBusiness is string && data.senderBusiness.size() <= 200)) &&
+        data.pickupAddress is string && data.pickupAddress.size() <= 500 &&
+        data.fromLocationId is string && data.fromLocationId.size() <= 80 &&
+        data.fromCity is string && data.fromCity.size() <= 100 &&
+        data.toLocationId is string && data.toLocationId.size() <= 80 &&
+        data.toCity is string && data.toCity.size() <= 100 &&
+        data.receiverName is string && data.receiverName.size() >= 1 && data.receiverName.size() <= 120 &&
+        data.receiverPhone is string && data.receiverPhone.size() <= 30 &&
+        (!('receiverEmail' in data) || (data.receiverEmail is string && data.receiverEmail.size() <= 200)) &&
+        data.deliveryAddress is string && data.deliveryAddress.size() <= 500 &&
+        data.parcelType is string && data.parcelType.size() <= 150 &&
+        data.weightCategory is string && data.weightCategory.size() <= 100 &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000)) &&
+        data.fare is number && data.fare >= 0 && data.fare <= 50000 &&
+        data.paymentMode in ['cash_on_delivery', 'upi_on_delivery'] &&
+        data.paymentStatus in ['pending', 'collected'] &&
+        data.status in [
+          'pending_approval', 'ordered', 'picked', 'shipped',
+          'pickup_scheduled', 'picked_up', 'in_transit',
+          'arrived_partur', 'out_for_delivery', 'delivered'
+        ] &&
+        data.createdAt is string && data.createdAt.size() >= 10 && data.createdAt.size() <= 40 &&
+        data.scheduledDeliveryDate is string && data.scheduledDeliveryDate.size() <= 40 &&
+        data.deliverySlot is string && data.deliverySlot.size() <= 120 &&
+        data.history is list && data.history.size() >= 1 && data.history.size() <= 100 && data.history[0] is map;
+    }
+
+    // Connection test document (authenticated read only; client writes forbidden)
     match /test/{docId} {
-      allow read, write: if true;
+      allow get: if isValidId(docId) && isSignedIn();
+      allow list: if false;
+      allow write: if false;
     }
 
-    // Users collection
+    // Users collection: PII isolated to owner or admin; only admin can delete or assign elevated roles
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow create, update: if isOwner(userId) || isStaff();
-      allow delete: if isAdmin();
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(userId) &&
+        isOwner(userId) &&
+        isValidUser(incoming()) &&
+        incoming().id == userId &&
+        (incoming().role == 'customer' ||
+         (incoming().role == 'admin' && isVerifiedAdminEmail()));
+      allow update: if isValidId(userId) &&
+        isValidUser(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().createdAt == existing().createdAt && (
+          (isOwner(userId) &&
+           incoming().diff(existing()).affectedKeys().hasOnly([
+             'name', 'email', 'phone', 'businessName', 'city', 'defaultAddress', 'avatarUrl'
+           ]) &&
+           incoming().role == existing().role) ||
+          (isOwner(userId) &&
+           isVerifiedAdminEmail() &&
+           incoming().diff(existing()).affectedKeys().hasOnly(['role']) &&
+           incoming().role == 'admin') ||
+          (isAdmin() &&
+           incoming().diff(existing()).affectedKeys().hasOnly([
+             'name', 'email', 'phone', 'businessName', 'city', 'defaultAddress', 'avatarUrl', 'role'
+           ]))
+        );
+      allow delete: if isValidId(userId) && isAdmin();
     }
 
-    // Parcels collection
+    // Parcels collection: strict auth required; data preserved until admin explicitly deletes it
     match /parcels/{parcelId} {
-      // Only sender, receiver, and staff can view or verify parcel tracking
-      allow get: if true;
-      allow list: if isStaff() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.senderEmail == request.auth.token.email));
-      allow create: if isSignedIn() || request.resource.data.userId == 'guest';
-      // ONLY admin and team members can manage the order tracking and update status!
-      allow update: if isStaff();
-      allow delete: if isAdmin();
+      allow get: if isValidId(parcelId) && isSignedIn() && (isStaff() || isSenderOrReceiver(existing()));
+      allow list: if isSignedIn() && (
+        existing().userId == request.auth.uid ||
+        (request.auth.token.email_verified == true && 'senderEmail' in existing() && existing().senderEmail == request.auth.token.email) ||
+        isStaff()
+      );
+      allow create: if isValidId(parcelId) &&
+        isSignedIn() &&
+        isValidParcel(incoming()) &&
+        incoming().id == parcelId &&
+        incoming().userId == request.auth.uid &&
+        (isStaff() || (incoming().status == 'pending_approval' && incoming().paymentStatus == 'pending'));
+      allow update: if isValidId(parcelId) &&
+        isValidParcel(incoming()) &&
+        isStaff() &&
+        incoming().id == existing().id &&
+        incoming().userId == existing().userId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().history.size() >= existing().history.size() && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'paymentStatus', 'history']) ||
+          incoming().diff(existing()).affectedKeys().hasOnly(['paymentStatus']) ||
+          isAdmin()
+        );
+      allow delete: if isValidId(parcelId) && isAdmin();
     }
 
     match /{document=**} {

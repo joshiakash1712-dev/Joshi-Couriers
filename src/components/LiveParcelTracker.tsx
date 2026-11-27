@@ -137,7 +137,7 @@ export const LiveParcelTracker: React.FC = () => {
           dotBg: 'bg-indigo-500',
           icon: Navigation,
           stepIndex: 2,
-          description: 'Moving along NH-752I / SH-176 corridor towards Partur and Mantha.',
+          description: 'Moving along NH-752I corridor towards Partur.',
         };
       case 'arrived_partur':
         return {
@@ -233,7 +233,7 @@ export const LiveParcelTracker: React.FC = () => {
                 Track Your Shipment Status
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-2xl">
-                Enter your booking ID to view live vehicle status, corridor progression, and early morning doorstep delivery milestones between Jalna, Partur, and Mantha.
+                Enter your booking ID to view live vehicle status, corridor progression, and early morning doorstep delivery milestones between Jalna and Partur.
               </p>
             </div>
 

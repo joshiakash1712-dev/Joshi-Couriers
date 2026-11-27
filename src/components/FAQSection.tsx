@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ChevronDown, MessageCircle, Phone, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 
 type FaqCategory = 'all' | 'timing' | 'pricing' | 'parcels';
 
@@ -21,8 +20,8 @@ const FAQS: FaqItem[] = [
     id: 'delivery-timing-window',
     category: 'timing',
     categoryLabel: 'Delivery Timing',
-    q: 'When are parcels picked up in Jalna and delivered in Partur or Mantha?',
-    a: 'Parcels collected today in Jalna are loaded directly into our Mahindra Maxximo (MH21 V 6370), departing Jalna between 4:00 AM and 5:00 AM. The vehicle reaches Partur by 6:00 AM to 6:30 AM, and doorstep hand-to-hand deliveries are completed between 6:30 AM and 8:30 AM (on average by 9:00 AM). Connections onward to Mantha are delivered between 8:30 AM and 10:00 AM via our trusted partner network.',
+    q: 'When are parcels picked up in Jalna and delivered in Partur?',
+    a: 'Parcels collected today in Jalna are loaded directly into our Mahindra Maxximo (MH21 V 6370), departing Jalna between 4:00 AM and 5:00 AM. The vehicle reaches Partur by 6:00 AM to 6:30 AM, and doorstep hand-to-hand deliveries are completed between 6:30 AM and 8:30 AM (on average by 9:00 AM).',
   },
   {
     id: 'pickup-cutoff-time',
@@ -35,15 +34,15 @@ const FAQS: FaqItem[] = [
     id: 'route-coverage-stops',
     category: 'timing',
     categoryLabel: 'Delivery Timing',
-    q: 'Do you pick up or drop off at villages along the Jalna to Mantha highway?',
-    a: 'Yes. We cover all 15 hubs and roadside checkpoints along the NH-752I and SH-176 corridor: Jalna, Ramnagar, Sindhi Kalegaon, Chitali, Putali, Viregaon, Watur, Watur Phata, Partur, Belora, Bhuwan, Wazar, Wazar Sarkate, Talegaon, and Mantha. Select any stop directly inside the booking form.',
+    q: 'Do you pick up or drop off at villages along the Jalna to Partur highway?',
+    a: 'Yes. We cover all 9 hubs and roadside checkpoints along the NH-752I Jalna to Partur corridor: Jalna, Ramnagar, Sindhi Kalegaon, Chitali, Putali, Viregaon, Watur, Watur Phata, and Partur. Select any stop directly inside the booking form.',
   },
   {
     id: 'pricing-range-breakdown',
     category: 'pricing',
     categoryLabel: 'Pricing & Payment',
     q: 'How much does a parcel delivery cost and how is the fare calculated?',
-    a: 'Standard shipments from Jalna to Partur start at a ₹70 base fare and typically range from ₹70 to ₹130 depending on weight bracket and commodity type. Shipments under 1 kg start at ₹70, medium parcels (1 to 5 kg) range from ₹85 to ₹110, heavy commercial bundles (5 to 25 kg) range from ₹115 to ₹145, and onward deliveries to Mantha or Talni include a ₹20 extension fee (capped at ₹160).',
+    a: 'Standard shipments from Jalna to Partur start at a ₹70 base fare and typically range from ₹70 to ₹130 depending on weight bracket and commodity type. Shipments under 1 kg start at ₹70, medium parcels (1 to 5 kg) range from ₹85 to ₹110, and heavy commercial bundles (5 to 25 kg) range from ₹115 to ₹130.',
   },
   {
     id: 'advance-payment-cod',
@@ -76,22 +75,46 @@ const CATEGORY_TABS: { id: FaqCategory; label: string }[] = [
 ];
 
 export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
-  const shouldReduceMotion = useReducedMotion();
   const [activeCategory, setActiveCategory] = useState<FaqCategory>('all');
-  const [openId, setOpenId] = useState<string | null>(FAQS[0].id);
+  const [openIds, setOpenIds] = useState<string[]>([FAQS[0].id]);
 
   const visibleFaqs =
     activeCategory === 'all'
       ? FAQS
       : FAQS.filter((item) => item.category === activeCategory);
 
+  const allVisibleOpen =
+    visibleFaqs.length > 0 && visibleFaqs.every((item) => openIds.includes(item.id));
+
+  const handleToggleItem = (id: string) => {
+    setOpenIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleAllVisible = () => {
+    const visibleIds = visibleFaqs.map((item) => item.id);
+    if (allVisibleOpen) {
+      setOpenIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
+    } else {
+      setOpenIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
   const handleCategoryChange = (category: FaqCategory) => {
     setActiveCategory(category);
-    const firstInCategory =
+    const itemsInCategory =
       category === 'all'
-        ? FAQS[0]
-        : FAQS.find((item) => item.category === category);
-    setOpenId(firstInCategory ? firstInCategory.id : null);
+        ? FAQS
+        : FAQS.filter((item) => item.category === category);
+
+    setOpenIds((prev) => {
+      const hasOpenInCategory = itemsInCategory.some((item) => prev.includes(item.id));
+      if (hasOpenInCategory || itemsInCategory.length === 0) {
+        return prev;
+      }
+      return [...prev, itemsInCategory[0].id];
+    });
   };
 
   // Schema.org FAQPage JSON-LD structured data
@@ -121,7 +144,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
       />
 
       {/* Header + Filter Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 border-b border-slate-200/80 dark:border-slate-800">
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 pb-6 border-b border-slate-200/80 dark:border-slate-800">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-[#0038BD] dark:text-blue-400">
             Clear Answers Before You Book
@@ -133,42 +156,52 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
             Frequently Asked Questions
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-            Details on morning delivery timings, fare slabs, cash-on-delivery terms, and accepted cargo along the Jalna, Partur, and Mantha corridor.
+            Details on morning delivery timings, fare slabs, cash-on-delivery terms, and accepted cargo along the Jalna to Partur corridor.
           </p>
         </div>
 
-        {/* Category Filter Tabs */}
-        <div
-          role="tablist"
-          aria-label="Filter questions by topic"
-          className="flex flex-wrap sm:flex-nowrap items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl self-start lg:self-end"
-        >
-          {CATEGORY_TABS.map((tab) => {
-            const isActive = activeCategory === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => handleCategoryChange(tab.id)}
-                className={`px-3 py-2 min-h-[40px] rounded-lg text-xs font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD] ${
-                  isActive
-                    ? 'bg-white dark:bg-slate-900 text-[#0038BD] dark:text-blue-400 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Category Filter Tabs + Expand/Collapse All */}
+        <div className="flex flex-wrap items-center gap-2 self-start xl:self-end">
+          <div
+            role="tablist"
+            aria-label="Filter questions by topic"
+            className="flex flex-wrap sm:flex-nowrap items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl"
+          >
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = activeCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => handleCategoryChange(tab.id)}
+                  className={`px-3 py-2 min-h-[40px] rounded-lg text-xs font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD] ${
+                    isActive
+                      ? 'bg-white dark:bg-slate-900 text-[#0038BD] dark:text-blue-400 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleToggleAllVisible}
+            className="px-3 py-2 min-h-[40px] rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
+          >
+            {allVisibleOpen ? 'Collapse all' : 'Expand all'}
+          </button>
         </div>
       </div>
 
-      {/* Flat Hairline-Separated Accordion List (Zero Nested Cards) */}
-      <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
+      {/* Multi-Open Hairline-Separated Accordion List (Smooth CSS Grid Row Transition) */}
+      <div className="divide-y divide-slate-200/80 dark:divide-slate-800 min-h-[240px]">
         {visibleFaqs.map((faq, idx) => {
-          const isOpen = openId === faq.id;
+          const isOpen = openIds.includes(faq.id);
           const panelId = `faq-panel-${faq.id}`;
           const buttonId = `faq-btn-${faq.id}`;
 
@@ -179,7 +212,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
                 type="button"
                 aria-expanded={isOpen}
                 aria-controls={panelId}
-                onClick={() => setOpenId(isOpen ? null : faq.id)}
+                onClick={() => handleToggleItem(faq.id)}
                 className="w-full min-h-[48px] py-4 px-2 sm:px-3 flex items-start sm:items-center justify-between gap-4 text-left rounded-xl hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
               >
                 <div className="min-w-0 flex-1 space-y-1">
@@ -197,7 +230,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
 
                 <span
                   aria-hidden="true"
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-1 sm:mt-0 transition-transform duration-200 ${
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-1 sm:mt-0 transition-transform duration-200 motion-reduce:transition-none ${
                     isOpen
                       ? 'bg-[#0038BD] text-white rotate-180'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
@@ -207,24 +240,23 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
                 </span>
               </button>
 
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    id={panelId}
-                    role="region"
-                    aria-labelledby={buttonId}
-                    initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="px-2 sm:px-3 pb-4 pt-1"
-                  >
+              <div
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+                aria-hidden={!isOpen}
+                className={`grid transition-[grid-template-rows,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+                  isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <div className="px-2 sm:px-3 pb-4 pt-1">
                     <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-[70ch]">
                       {faq.a}
                     </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  </div>
+                </div>
+              </div>
             </div>
           );
         })}

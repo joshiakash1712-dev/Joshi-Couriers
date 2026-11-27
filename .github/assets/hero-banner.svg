@@ -41,7 +41,7 @@
 
     <!-- Typography -->
     <text x="72" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5">JOSHI COURIERS</text>
-    <text x="74" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#EF8E01" letter-spacing="1.5">FAST. RELIABLE. LOCAL. • JALNA ➔ PARTUR ➔ MANTHA</text>
+    <text x="74" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#EF8E01" letter-spacing="1.5">FAST. RELIABLE. LOCAL. • JALNA ➔ PARTUR</text>
   </g>
 
   <!-- Live Corridor Badge Top Right -->
@@ -59,7 +59,7 @@
   <g transform="translate(48, 140)">
     <!-- Road Track Line -->
     <rect x="0" y="28" width="864" height="6" rx="3" fill="rgba(255, 255, 255, 0.12)" />
-    <rect x="0" y="28" width="580" height="6" rx="3" fill="url(#goldGrad)" />
+    <rect x="0" y="28" width="831" height="6" rx="3" fill="url(#goldGrad)" />
 
     <!-- Stop 1: Jalna -->
     <g transform="translate(0, 0)">
@@ -70,26 +70,26 @@
       <text x="31" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#94A3B8">Shop Pickups</text>
     </g>
 
-    <!-- Stop 2: Partur -->
+    <!-- Stop 2: Watur Phata -->
     <g transform="translate(420, 0)">
+      <circle cx="31" cy="31" r="14" fill="#1E293B" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" />
+      <circle cx="31" cy="31" r="5" fill="#3B82F6" />
+      <text x="31" y="-8" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">WATUR PHATA</text>
+      <text x="31" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#93C5FD">5:15 - 5:45 AM</text>
+      <text x="31" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#94A3B8">NH-752I Corridor</text>
+    </g>
+
+    <!-- Stop 3: Partur -->
+    <g transform="translate(800, 0)">
       <circle cx="31" cy="31" r="16" fill="#EF8E01" stroke="#FFFFFF" stroke-width="3" />
       <circle cx="31" cy="31" r="6" fill="#FFFFFF" />
       <text x="31" y="-8" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">PARTUR</text>
-      <text x="31" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FCD34D">6:00 - 6:30 AM</text>
+      <text x="31" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#FCD34D">6:30 - 8:30 AM</text>
       <text x="31" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#10B981">Doorstep Handover</text>
     </g>
 
-    <!-- Stop 3: Mantha -->
-    <g transform="translate(800, 0)">
-      <circle cx="31" cy="31" r="14" fill="#1E293B" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" />
-      <circle cx="31" cy="31" r="5" fill="#3B82F6" />
-      <text x="31" y="-8" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF">MANTHA</text>
-      <text x="31" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#93C5FD">8:30 AM</text>
-      <text x="31" y="80" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="500" fill="#94A3B8">Trusted Partner</text>
-    </g>
-
     <!-- Vehicle Marker moving along the route -->
-    <g transform="translate(240, 10)">
+    <g transform="translate(560, 10)">
       <rect x="0" y="0" width="138" height="34" rx="8" fill="#FFFFFF" stroke="#0038BD" stroke-width="1.5" />
       <!-- Small Truck Icon -->
       <path d="M 14 22 L 14 12 L 24 12 L 29 17 L 29 22 Z" fill="#0038BD" />

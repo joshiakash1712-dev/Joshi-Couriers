@@ -142,13 +142,13 @@ export const Hero: React.FC = () => {
                 We ship to <span className="text-[#0038BD] dark:text-blue-400 font-black">Partur</span>.
               </span>
               <span className="hero-title-line block">
-                We connect to <span className="text-[#0038BD] dark:text-blue-400 font-black">Mantha</span>.
+                Delivered <span className="text-[#EF8E01] font-black">next morning</span>.
               </span>
             </h1>
 
             {/* Approved Business Explanation Paragraph */}
             <p className="hero-desc text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed max-w-lg font-normal">
-              Parcels picked up in Jalna are shipped to Partur <strong className="font-bold text-slate-900 dark:text-slate-100">next morning</strong>. From Partur, we connect through our trusted partners and deliver up to Mantha. We work with <strong className="font-bold text-slate-900 dark:text-slate-100">wholesalers, retailers, shops, courier offices &amp; businesses</strong>.
+              Parcels picked up in Jalna are shipped directly to Partur <strong className="font-bold text-slate-900 dark:text-slate-100">next morning (6:30-8:30 AM)</strong> with hand-to-hand delivery. We work with <strong className="font-bold text-slate-900 dark:text-slate-100">wholesalers, retailers, shops, courier offices &amp; businesses</strong>.
             </p>
 
             {/* Micro value highlights */}

@@ -5,7 +5,6 @@ import {
   signInWithPopup, 
   signInWithRedirect, 
   getRedirectResult,
-  signInAnonymously,
   signOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -27,7 +26,8 @@ import {
   where, 
   orderBy, 
   onSnapshot, 
-  updateDoc 
+  updateDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -91,22 +91,26 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 // Validate connection per Firebase Skill requirements
-async function testConnection() {
+export async function testConnection(): Promise<boolean> {
+  if (!auth.currentUser) {
+    return true;
+  }
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
+    return true;
   } catch (error) {
     if (error instanceof Error && error.message.includes('the client is offline')) {
       console.warn('Firestore operating in cached/offline mode.');
+      return false;
     }
+    return true;
   }
 }
-testConnection();
 
 export { 
   signInWithPopup, 
   signInWithRedirect, 
   getRedirectResult,
-  signInAnonymously,
   signOut, 
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -121,6 +125,7 @@ export {
   where, 
   orderBy, 
   onSnapshot, 
-  updateDoc 
+  updateDoc,
+  deleteDoc
 };
 export type { FirebaseUser };

@@ -11,9 +11,12 @@ import {
   BarChart3, 
   ShieldCheck, 
   LogOut,
-  ChevronDown
+  ChevronDown,
+  Bell,
+  BellOff
 } from 'lucide-react';
 import { useAuthParcel } from '../context/AuthParcelContext';
+import { useParcelNotifications } from '../context/NotificationContext';
 import { ThemeToggle } from './ThemeToggle';
 
 interface HeaderProps {
@@ -32,6 +35,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { currentUser, userParcels, logout } = useAuthParcel();
+  const { isSupported, permission, alertsEnabled, toggleAlerts } = useParcelNotifications();
+  const isAlertsActive = isSupported && permission === 'granted' && alertsEnabled;
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800/80 shadow-2xs w-full transition-colors duration-200">
@@ -194,6 +199,24 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
+            {/* Browser Delivery Alert Button */}
+            {currentUser && isSupported && (
+              <button
+                type="button"
+                onClick={toggleAlerts}
+                id="header-notifications-btn"
+                aria-label={isAlertsActive ? 'Pause parcel delivery notifications' : 'Enable parcel delivery notifications'}
+                title={isAlertsActive ? 'Delivery alerts active (click to pause)' : 'Enable Out for Delivery & Delivered alerts'}
+                className={`hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-xl border transition-colors cursor-pointer shrink-0 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/30 ${
+                  isAlertsActive
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
+                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                {isAlertsActive ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+              </button>
+            )}
+
             {/* Theme Toggle (Header Bar) */}
             <ThemeToggle variant="header" className="hidden min-[360px]:flex" />
 
@@ -282,6 +305,31 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Mobile Drawer Theme Switcher Row */}
             <ThemeToggle variant="drawer" />
 
+            {/* Mobile Drawer Browser Notification Control */}
+            {currentUser && isSupported && (
+              <button
+                type="button"
+                onClick={toggleAlerts}
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-between transition-colors cursor-pointer min-h-[44px]"
+              >
+                <span className="flex items-center gap-2">
+                  {isAlertsActive ? (
+                    <Bell className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <BellOff className="w-4 h-4 text-slate-400" />
+                  )}
+                  <span>Delivery Alerts (Out for Delivery &amp; Delivered)</span>
+                </span>
+                <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
+                  isAlertsActive
+                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                }`}>
+                  {isAlertsActive ? 'On' : permission === 'denied' ? 'Blocked' : 'Off'}
+                </span>
+              </button>
+            )}
+
             {/* If Customer or has parcels */}
             {(currentUser?.role === 'customer' || userParcels.length > 0) && (
               <button
@@ -320,7 +368,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Schedule Notice */}
             <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-xs text-slate-600 dark:text-slate-300 space-y-1 border border-slate-100 dark:border-slate-800">
               <p className="font-bold text-slate-900 dark:text-slate-100">Joshi Couriers (Father &amp; Son Team)</p>
-              <p>Daily Morning Route: Jalna (4-5 AM) ➔ Partur (6-6:30 AM) ➔ Mantha</p>
+              <p>Daily Morning Route: Jalna (4-5 AM) ➔ Partur (6-6:30 AM)</p>
               <p className="text-emerald-700 dark:text-emerald-400 font-semibold">Delivery Window: 6:30 - 8:30 AM</p>
             </div>
 

@@ -26,7 +26,7 @@ Thank you for your interest in contributing to the **Joshi Couriers** daily logi
 - **Viewport Resilience**: Use `min-h-[100dvh]` rather than `h-screen` for full viewport layouts.
 - **Copy Standards**:
   - Do NOT use em-dashes anywhere in rendered UI copy. Use colons, commas, hyphens, or natural phrasing.
-  - Keep copy authentic, human, and grounded in the Jalna, Partur, and Mantha corridor.
+  - Keep copy authentic, human, and grounded in the Jalna to Partur corridor.
 - **Touch Targets**: Mobile buttons and interactive elements must have minimum 44px by 44px hit areas.
 
 ## Pre-PR Verification

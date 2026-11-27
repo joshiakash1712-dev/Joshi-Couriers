@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ArrowRight, Clock, Landmark, Building2, Store, Truck } from 'lucide-react';
+import { ArrowRight, Clock, Landmark, Store, Truck } from 'lucide-react';
 import { gsap, useGSAP } from '../lib/gsap';
 
 export const RouteTimelineCard: React.FC = () => {
@@ -50,12 +50,12 @@ export const RouteTimelineCard: React.FC = () => {
             },
             '-=0.2'
           )
-          // Move the courier van indicator along the highway route from Jalna toward Partur
+          // Move the courier van indicator along the highway route from Jalna to Partur
           .fromTo(
             vanIndicatorRef.current,
             { left: '0%' },
             {
-              left: '52%', // stopping at Partur
+              left: '100%', // arriving at Partur
               duration: 1.0,
               ease: 'power2.inOut',
             },
@@ -111,10 +111,10 @@ export const RouteTimelineCard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-4 items-center">
         
-        {/* Left 3-Stop Route Sequence (lg:col-span-8) */}
+        {/* Left 3-Step Route Sequence (lg:col-span-8) */}
         <div className="lg:col-span-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-2">
           
-          {/* Stop 1: Jalna */}
+          {/* Step 1: Jalna */}
           <div className="route-stop-node flex items-center gap-3.5 flex-1 min-w-[140px]">
             <div className="w-12 h-12 rounded-full bg-[#0038BD] dark:bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <Landmark className="w-6 h-6" strokeWidth={2} />
@@ -134,18 +134,18 @@ export const RouteTimelineCard: React.FC = () => {
             <ArrowRight className="w-5 h-5 stroke-[2]" />
           </div>
 
-          {/* Stop 2: Partur */}
+          {/* Step 2: Direct NH-752I Transit */}
           <div className="route-stop-node flex items-center gap-3.5 flex-1 min-w-[150px]">
             <div className="w-12 h-12 rounded-full bg-[#EF8E01] text-white flex items-center justify-center shadow-xs shrink-0">
-              <Store className="w-6 h-6" strokeWidth={2} />
+              <Truck className="w-6 h-6" strokeWidth={2} />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 leading-tight">
-                Partur
+                NH-752I Transit
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug">
-                Tomorrow<br />
-                <span className="text-slate-700 dark:text-slate-300 font-semibold">6:30 - 8:30 AM</span>
+                4:00 - 6:00 AM<br />
+                <span className="text-slate-700 dark:text-slate-300 font-semibold">Direct van run</span>
               </p>
             </div>
           </div>
@@ -155,18 +155,18 @@ export const RouteTimelineCard: React.FC = () => {
             <ArrowRight className="w-5 h-5 stroke-[2]" />
           </div>
 
-          {/* Stop 3: Mantha */}
+          {/* Step 3: Partur */}
           <div className="route-stop-node flex items-center gap-3.5 flex-1 min-w-[150px]">
             <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
-              <Building2 className="w-6 h-6" strokeWidth={2} />
+              <Store className="w-6 h-6" strokeWidth={2} />
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 leading-tight">
-                Mantha
+                Partur
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 leading-snug">
-                Through our<br />
-                partner network
+                Tomorrow<br />
+                <span className="text-slate-700 dark:text-slate-300 font-semibold">6:30 - 8:30 AM</span>
               </p>
             </div>
           </div>

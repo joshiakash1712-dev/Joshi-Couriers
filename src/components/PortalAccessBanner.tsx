@@ -153,7 +153,7 @@ export const PortalAccessBanner: React.FC<PortalAccessBannerProps> = ({
             Courier Admin &amp; Live Manifest
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed">
-            Operations control for Anant Joshi &amp; his son (Akash Joshi): monitor total morning dispatches, Partur/Mantha route volume breakdowns, freight collections, and live trip manifests.
+            Operations control for Anant Joshi &amp; his son (Akash Joshi): monitor total morning dispatches, Jalna to Partur route volume breakdowns, freight collections, and live trip manifests.
           </p>
 
           <div className="mt-4 grid grid-cols-2 gap-2.5 text-xs">

@@ -5,60 +5,99 @@
       "description": "Authenticated user profile with role and merchant details",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "phone": { "type": "string" },
-        "businessName": { "type": "string" },
-        "city": { "type": "string" },
-        "defaultAddress": { "type": "string" },
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "email": { "type": "string", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "businessName": { "type": "string", "maxLength": 200 },
+        "city": { "type": "string", "maxLength": 100 },
+        "defaultAddress": { "type": "string", "maxLength": 500 },
         "role": { "type": "string", "enum": ["customer", "admin", "team"] },
-        "avatarUrl": { "type": "string" },
-        "createdAt": { "type": "string" }
+        "avatarUrl": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "minLength": 10, "maxLength": 40 }
       },
       "required": ["id", "name", "role", "createdAt"]
     },
     "ParcelItem": {
       "title": "ParcelItem",
-      "description": "Delivery shipment booking",
+      "description": "Authenticated delivery shipment booking preserved until admin deletion",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "userId": { "type": "string" },
-        "senderName": { "type": "string" },
-        "senderPhone": { "type": "string" },
-        "senderEmail": { "type": "string" },
-        "senderBusiness": { "type": "string" },
-        "pickupAddress": { "type": "string" },
-        "fromLocationId": { "type": "string" },
-        "fromCity": { "type": "string" },
-        "toLocationId": { "type": "string" },
-        "toCity": { "type": "string" },
-        "receiverName": { "type": "string" },
-        "receiverPhone": { "type": "string" },
-        "deliveryAddress": { "type": "string" },
-        "parcelType": { "type": "string" },
-        "weightCategory": { "type": "string" },
-        "notes": { "type": "string" },
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_-]+$" },
+        "userId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_-]+$" },
+        "senderName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "senderPhone": { "type": "string", "maxLength": 30 },
+        "senderEmail": { "type": "string", "maxLength": 200 },
+        "senderBusiness": { "type": "string", "maxLength": 200 },
+        "pickupAddress": { "type": "string", "maxLength": 500 },
+        "fromLocationId": { "type": "string", "maxLength": 80 },
+        "fromCity": { "type": "string", "maxLength": 100 },
+        "toLocationId": { "type": "string", "maxLength": 80 },
+        "toCity": { "type": "string", "maxLength": 100 },
+        "receiverName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "receiverPhone": { "type": "string", "maxLength": 30 },
+        "receiverEmail": { "type": "string", "maxLength": 200 },
+        "deliveryAddress": { "type": "string", "maxLength": 500 },
+        "parcelType": { "type": "string", "maxLength": 150 },
+        "weightCategory": { "type": "string", "maxLength": 100 },
+        "notes": { "type": "string", "maxLength": 1000 },
         "fare": { "type": "number" },
-        "paymentMode": { "type": "string" },
-        "paymentStatus": { "type": "string" },
-        "status": { "type": "string" },
-        "createdAt": { "type": "string" },
-        "scheduledDeliveryDate": { "type": "string" },
-        "deliverySlot": { "type": "string" }
+        "paymentMode": { "type": "string", "enum": ["cash_on_delivery", "upi_on_delivery"] },
+        "paymentStatus": { "type": "string", "enum": ["pending", "collected"] },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending_approval",
+            "ordered",
+            "picked",
+            "shipped",
+            "pickup_scheduled",
+            "picked_up",
+            "in_transit",
+            "arrived_partur",
+            "out_for_delivery",
+            "delivered"
+          ]
+        },
+        "createdAt": { "type": "string", "minLength": 10, "maxLength": 40 },
+        "scheduledDeliveryDate": { "type": "string", "maxLength": 40 },
+        "deliverySlot": { "type": "string", "maxLength": 120 },
+        "history": { "type": "array", "description": "Append-only shipment milestone log" }
       },
-      "required": ["id", "userId", "senderName", "senderPhone", "fromCity", "toCity", "fare", "status", "createdAt"]
+      "required": [
+        "id",
+        "userId",
+        "senderName",
+        "senderPhone",
+        "pickupAddress",
+        "fromLocationId",
+        "fromCity",
+        "toLocationId",
+        "toCity",
+        "receiverName",
+        "receiverPhone",
+        "deliveryAddress",
+        "parcelType",
+        "weightCategory",
+        "fare",
+        "paymentMode",
+        "paymentStatus",
+        "status",
+        "createdAt",
+        "scheduledDeliveryDate",
+        "deliverySlot",
+        "history"
+      ]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "UserProfile",
-      "description": "User profile collection"
+      "description": "Authenticated user profile collection"
     },
     "/parcels/{parcelId}": {
       "schema": "ParcelItem",
-      "description": "Parcel delivery bookings collection"
+      "description": "Parcel delivery bookings collection preserved until deleted by admin"
     }
   }
 }

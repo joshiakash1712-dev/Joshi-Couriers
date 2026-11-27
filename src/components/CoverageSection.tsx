@@ -19,7 +19,7 @@ interface CoverageSectionProps {
 export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking }) => {
   const shouldReduceMotion = useReducedMotion();
   const [selectedLocation, setSelectedLocation] = useState<RouteLocation>(ROUTE_LOCATIONS[0]);
-  const [filterTaluka, setFilterTaluka] = useState<'all' | 'Jalna' | 'Partur' | 'Mantha'>('all');
+  const [filterTaluka, setFilterTaluka] = useState<'all' | 'Jalna' | 'Partur'>('all');
 
   const filteredLocations = filterTaluka === 'all' 
     ? ROUTE_LOCATIONS 
@@ -88,14 +88,14 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0038BD]/10 text-[#0038BD] text-xs font-bold uppercase tracking-wider mb-2">
             <Navigation className="w-3.5 h-3.5" />
-            <span>NH-752I &amp; SH-176 CORRIDOR</span>
+            <span>NH-752I CORRIDOR</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
             Complete Route &amp; Village Delivery Network
           </h2>
           <div className="w-12 h-1 bg-[#EF8E01] rounded-full mx-auto mt-3" />
           <p className="text-base sm:text-lg text-slate-600 mt-3">
-            Covering all cities, market towns, and village phatas across Jalna, Partur, and Mantha talukas with daily doorstep courier pickups and deliveries.
+            Covering all cities, market towns, and village phatas across Jalna and Partur talukas with daily doorstep courier pickups and deliveries.
           </p>
         </motion.div>
 
@@ -110,14 +110,14 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
             <div>
               <span className="text-xs font-extrabold uppercase tracking-wider text-[#0038BD]">
-                INTERACTIVE HIGHWAY CORRIDOR (65 KM)
+                INTERACTIVE HIGHWAY CORRIDOR (50 KM)
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
-                Jalna ➔ Watur Phata ➔ Partur ➔ Mantha
+                Jalna ➔ Viregaon ➔ Watur Phata ➔ Partur
               </h3>
             </div>
             <button
-              onClick={() => onOpenBooking('jalna', 'mantha')}
+              onClick={() => onOpenBooking('jalna', 'partur')}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-all active:scale-95"
             >
               <span>Book Full Route Pickup</span>
@@ -196,7 +196,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
             </div>
 
             <button
-              onClick={() => onOpenBooking(selectedLocation.id, selectedLocation.id === 'jalna' ? 'mantha' : 'jalna')}
+              onClick={() => onOpenBooking(selectedLocation.id, selectedLocation.id === 'jalna' ? 'partur' : 'jalna')}
               className="px-4 py-2 bg-[#0038BD] hover:bg-[#002d99] text-white font-bold rounded-xl transition-all shadow-2xs active:scale-95 shrink-0"
             >
               Book from {selectedLocation.name} ➔
@@ -207,7 +207,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
         {/* Taluka Filter Buttons */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <span className="text-xs font-bold text-slate-500 mr-2">Filter by Taluka:</span>
-          {(['all', 'Jalna', 'Partur', 'Mantha'] as const).map((taluka) => (
+          {(['all', 'Jalna', 'Partur'] as const).map((taluka) => (
             <button
               key={taluka}
               onClick={() => setFilterTaluka(taluka)}
@@ -306,7 +306,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
                     Doorstep Pickup Available
                   </span>
                   <button
-                    onClick={() => onOpenBooking(loc.id, loc.id === 'jalna' ? 'mantha' : 'jalna')}
+                    onClick={() => onOpenBooking(loc.id, loc.id === 'jalna' ? 'partur' : 'jalna')}
                     className="inline-flex items-center gap-1 text-xs font-bold text-[#0038BD] hover:text-[#EF8E01] transition-colors"
                   >
                     <span>Book</span>

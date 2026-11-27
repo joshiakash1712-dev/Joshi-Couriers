@@ -13,7 +13,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenBooking }) => {
     {
       num: '01',
       title: 'Book Pickup',
-      desc: 'Select your pickup village/city and destination from our 15 route stops.',
+      desc: 'Select your pickup village/city and destination from our 9 route stops.',
       detail: 'Zero advance payment or app download needed.',
       icon: <Smartphone className="w-6 h-6 text-[#0038BD]" strokeWidth={2.2} />,
       accentBg: 'bg-blue-50 border-blue-100 text-[#0038BD]',
@@ -29,7 +29,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenBooking }) => {
     {
       num: '03',
       title: 'We Deliver',
-      desc: 'Direct hand-to-hand delivery to recipient in Jalna, Partur, Mantha or intermediate villages.',
+      desc: 'Direct hand-to-hand delivery to recipient in Jalna, Partur, or intermediate villages.',
       detail: 'Pay standard delivery fee upon arrival via Cash or UPI.',
       icon: <CheckCircle2 className="w-6 h-6 text-emerald-600" strokeWidth={2.2} />,
       accentBg: 'bg-emerald-50 border-emerald-100 text-emerald-700',
@@ -77,7 +77,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenBooking }) => {
             How It Works
           </h2>
           <p className="text-sm sm:text-base text-slate-600 mt-2 font-normal">
-            Fast, honest, and direct courier service across all 15 corridor locations.
+            Fast, honest, and direct courier service across all 9 corridor locations.
           </p>
         </motion.div>
 
@@ -133,7 +133,7 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenBooking }) => {
         >
           <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-700">
             <Clock className="w-4 h-4 text-[#EF8E01] shrink-0" />
-            <span><strong>Corridor Operations:</strong> 8:00 AM - 8:00 PM (Monday to Sunday, All 15 stops)</span>
+            <span><strong>Corridor Operations:</strong> 8:00 AM - 8:00 PM (Monday to Sunday, All 9 stops)</span>
           </div>
           <button
             onClick={onOpenBooking}
