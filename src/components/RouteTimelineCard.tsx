@@ -136,7 +136,7 @@ export const RouteTimelineCard: React.FC = () => {
 
           {/* Step 2: Direct NH-752I Transit */}
           <div className="route-stop-node flex items-center gap-3.5 flex-1 min-w-[150px]">
-            <div className="w-12 h-12 rounded-full bg-[#EF8E01] text-white flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-12 h-12 rounded-full bg-[#EF8E01] text-slate-950 flex items-center justify-center shadow-xs shrink-0">
               <Truck className="w-6 h-6" strokeWidth={2} />
             </div>
             <div>
@@ -157,7 +157,7 @@ export const RouteTimelineCard: React.FC = () => {
 
           {/* Step 3: Partur */}
           <div className="route-stop-node flex items-center gap-3.5 flex-1 min-w-[150px]">
-            <div className="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-12 h-12 rounded-full bg-emerald-700 text-white flex items-center justify-center shadow-xs shrink-0">
               <Store className="w-6 h-6" strokeWidth={2} />
             </div>
             <div>

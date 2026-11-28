@@ -174,7 +174,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ variant = 'header', cl
       id="theme-toggle-btn"
       aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
       title={isDark ? 'Switch to light mode (currently Dark)' : 'Switch to dark mode (currently Light)'}
-      className={`group relative w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200/90 dark:hover:bg-slate-700/90 border border-slate-200/80 dark:border-slate-700/80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/30 shrink-0 overflow-hidden shadow-2xs hover:scale-105 active:scale-95 ${className}`}
+      className={`group relative w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200/90 dark:hover:bg-slate-700/90 active:bg-slate-300/80 dark:active:bg-slate-600 border border-slate-200/80 dark:border-slate-700/80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/30 shrink-0 overflow-hidden shadow-2xs hover:scale-105 active:scale-95 cursor-pointer ${className}`}
     >
       {/* Subtle radial ambient glow behind the icon */}
       <span 

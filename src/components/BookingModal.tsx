@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   MessageCircle, 
@@ -19,6 +19,7 @@ import { ROUTE_LOCATIONS } from '../data/locations';
 import { LocationSearchSelect } from './LocationSearchSelect';
 import { useAuthParcel } from '../context/AuthParcelContext';
 import { useToast } from '../hooks/useToast';
+import { useBodyScrollLock, useModalScrollForwarding } from '../hooks/useBodyScrollLock';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -39,6 +40,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 }) => {
   const { currentUser, createParcelBooking, signInWithGoogle } = useAuthParcel();
   const toast = useToast();
+  const backdropRef = useRef<HTMLDivElement>(null);
+  useBodyScrollLock(isOpen);
+  useModalScrollForwarding(backdropRef, isOpen);
   const [createdParcelId, setCreatedParcelId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -216,12 +220,13 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div 
+          ref={backdropRef}
           key="booking-modal-backdrop"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-40 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 min-h-[100dvh]"
+          className="fixed inset-0 z-50 overflow-hidden overscroll-none touch-none bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 min-h-[100dvh]"
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -232,20 +237,23 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Book Parcel Pickup"
+            className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90dvh] touch-auto"
           >
             
             {/* Modal Header */}
-            <div className="bg-[#0038BD] text-white p-5 sm:p-7 relative">
+            <div className="bg-[#0038BD] text-white p-5 sm:p-6 relative shrink-0">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-white/80 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+                className="absolute top-4 right-4 text-white/90 hover:text-white active:text-white p-2 rounded-full hover:bg-white/15 active:bg-white/25 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="flex items-center gap-2 text-xs font-bold text-[#EF8E01] uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider mb-1">
                 <Package className="w-4 h-4" />
                 <span>Doorstep Courier Booking</span>
               </div>
@@ -263,7 +271,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-6 sm:p-8 text-center space-y-4"
+                  data-modal-scroll="true"
+                  className="p-6 sm:p-8 text-center space-y-4 flex-1 overflow-y-auto overscroll-contain"
                 >
                   <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
                     <motion.div
@@ -306,7 +315,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       href={generateWhatsAppUrl(createdParcelId)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-3 px-4 text-xs font-bold text-white bg-[#25D366] hover:bg-[#1fb858] rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors min-h-[44px]"
+                      className="w-full py-3 px-4 text-xs font-bold text-white hover:text-white active:text-white bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors min-h-[44px]"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>Send Dispatch Copy on WhatsApp</span>
@@ -321,7 +330,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             onClose();
                             onViewMyParcels();
                           }}
-                          className="w-full py-3 px-4 text-xs font-bold text-white bg-[#0038BD] hover:bg-[#002d99] rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors min-h-[44px] cursor-pointer"
+                          className="w-full py-3 px-4 text-xs font-bold text-white hover:text-white active:text-white bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-colors min-h-[44px] cursor-pointer"
                         >
                           <Package className="w-4 h-4" />
                           <span>View in My Parcels</span>
@@ -335,8 +344,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                         }}
                         className={`w-full py-3 px-4 text-xs font-bold rounded-xl transition-colors min-h-[44px] cursor-pointer ${
                           onViewMyParcels 
-                            ? 'text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700' 
-                            : 'text-white bg-[#0038BD] hover:bg-[#002d99]'
+                            ? 'text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600' 
+                            : 'text-white hover:text-white active:text-white bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070]'
                         }`}
                       >
                         Done
@@ -352,20 +361,21 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.2 }}
                   onSubmit={handleSubmit} 
-                  className="p-5 sm:p-7 space-y-4 text-left max-h-[80dvh] overflow-y-auto"
+                  data-modal-scroll="true"
+                  className="p-5 sm:p-7 space-y-4 text-left flex-1 overflow-y-auto overscroll-contain"
                 >
                   {/* Authentication Gate Banner when Signed Out */}
                   {!currentUser && (
-                    <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 space-y-2.5 text-xs">
+                    <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-700/70 space-y-3 text-xs">
                       <div className="flex items-start gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0">
                           <Lock className="w-4 h-4" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-amber-950 dark:text-amber-200 text-sm">
+                          <h4 className="font-bold text-amber-950 dark:text-amber-100 text-sm">
                             Sign in required to save your booking
                           </h4>
-                          <p className="text-amber-900/90 dark:text-amber-300/90 text-[11px] mt-0.5 leading-relaxed">
+                          <p className="text-amber-900 dark:text-amber-200/90 text-[11px] mt-0.5 leading-relaxed">
                             All shipments are stored permanently under your verified account so records stay preserved and trackable until cleared by an admin.
                           </p>
                         </div>
@@ -375,7 +385,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           type="button"
                           onClick={handleQuickGoogleSignIn}
                           disabled={isSigningIn}
-                          className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 font-bold text-xs flex items-center gap-2 shadow-2xs cursor-pointer min-h-[40px] disabled:opacity-60"
+                          className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 text-slate-900 dark:text-white hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white border border-slate-300 dark:border-slate-600 font-bold text-xs flex items-center gap-2 shadow-2xs cursor-pointer min-h-[40px] transition-colors disabled:opacity-60"
                         >
                           {isSigningIn ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                           <span>{isSigningIn ? 'Connecting Google...' : 'Continue with Google'}</span>
@@ -384,7 +394,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                           <button
                             type="button"
                             onClick={onOpenAuth}
-                            className="px-3.5 py-2 rounded-xl bg-[#0038BD] hover:bg-[#002d99] text-white font-bold text-xs cursor-pointer min-h-[40px]"
+                            className="px-3.5 py-2 rounded-xl bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white font-bold text-xs cursor-pointer min-h-[40px] transition-colors"
                           >
                             Sign In with Email
                           </button>
@@ -395,23 +405,23 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
                   {/* Location Selector (From -> To with swap) */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <label className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                         <Navigation className="w-3.5 h-3.5 text-[#0038BD] dark:text-blue-400" />
                         <span>1. Select Pickup &amp; Delivery Locations</span>
                       </label>
                       <button
                         type="button"
                         onClick={handleSwapLocations}
-                        className="text-[11px] font-bold text-[#0038BD] dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        className="text-[11px] font-bold text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-100 active:text-[#002070] dark:active:text-white flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 shadow-2xs hover:bg-blue-50 dark:hover:bg-slate-700 active:bg-blue-100 dark:active:bg-slate-600 transition-colors cursor-pointer shrink-0"
                         title="Swap Pickup and Delivery Locations"
                       >
-                        <ArrowRightLeft className="w-3 h-3 text-[#EF8E01]" />
+                        <ArrowRightLeft className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                         <span>Swap</span>
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
                       <LocationSearchSelect
                         id="booking-pickup-location"
                         label="Pickup Location (From)"
@@ -432,7 +442,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     </div>
 
                     <div className="pt-1">
-                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block mb-1.5">
+                      <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 block mb-1.5">
                         Popular Route Pairs:
                       </span>
                       <div className="flex flex-wrap gap-1.5">
@@ -448,10 +458,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             key={pair.label}
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, fromLocationId: pair.from, toLocationId: pair.to }))}
-                            className={`text-[10px] font-semibold px-2 py-0.8 rounded-md border transition-all cursor-pointer ${
+                            className={`text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-colors cursor-pointer whitespace-nowrap ${
                               formData.fromLocationId === pair.from && formData.toLocationId === pair.to
-                                ? 'bg-[#0038BD] text-white border-[#0038BD]'
-                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                ? 'bg-[#0038BD] text-white border-[#0038BD] hover:bg-[#002d99] hover:text-white active:bg-[#002070] active:text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-200 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white'
                             }`}
                           >
                             {pair.label}
@@ -460,12 +470,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between text-[11px] font-medium text-slate-600 dark:text-slate-400 border-t border-slate-200/60 dark:border-slate-700">
+                    <div className="pt-2 flex items-center justify-between text-[11px] font-medium text-slate-700 dark:text-slate-300 border-t border-slate-200/60 dark:border-slate-700">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-[#0038BD] dark:text-blue-400" />
                         <span><strong>Route:</strong> {fromLocation.name} ➔ {toLocation.name}</span>
                       </span>
-                      <span className="text-slate-500 dark:text-slate-400">
+                      <span className="text-slate-600 dark:text-slate-300">
                         Approx. {calculateDistance()} km via NH-752I
                       </span>
                     </div>
@@ -523,9 +533,9 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   {/* Optional Receiver Info */}
                   <div className="pt-1">
                     <details className="group border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
-                      <summary className="cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-300 p-3 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between select-none">
+                      <summary className="cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-200 p-3 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-200 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white flex items-center justify-between select-none transition-colors">
                         <span>+ Add Receiver Details in {toLocation.name} (Optional)</span>
-                        <span className="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-300 group-open:rotate-180 transition-transform">▼</span>
                       </summary>
                       <div className="p-3.5 space-y-3 bg-white dark:bg-slate-800/40">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -618,16 +628,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                       type="submit"
                       id="modal-submit-whatsapp"
                       disabled={isSubmitting}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-[#EF8E01] hover:bg-[#d88001] shadow-lg shadow-[#EF8E01]/25 transition-all cursor-pointer disabled:opacity-60 min-h-[48px]"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold text-slate-950 hover:text-slate-950 active:text-slate-950 bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] shadow-lg shadow-[#EF8E01]/25 transition-all cursor-pointer disabled:opacity-60 min-h-[48px]"
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin text-white" />
+                          <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
                           <span>Saving Pickup Booking...</span>
                         </>
                       ) : (
                         <>
-                          <Package className="w-4 h-4 text-white" />
+                          <Package className="w-4 h-4 text-slate-950" />
                           <span>{currentUser ? 'Confirm Pickup Booking' : 'Sign In & Confirm Booking'}</span>
                         </>
                       )}
@@ -637,7 +647,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   <div className="text-center pt-1">
                     <a
                       href="tel:+919404040606"
-                      className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-[#0038BD] dark:hover:text-blue-400 inline-flex items-center gap-1.5"
+                      className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white inline-flex items-center gap-1.5 transition-colors"
                     >
                       <Phone className="w-3.5 h-3.5" />
                       <span>Prefer to call directly? +91 94040 40606</span>

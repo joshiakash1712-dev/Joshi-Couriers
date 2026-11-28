@@ -178,8 +178,8 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
                   onClick={() => handleCategoryChange(tab.id)}
                   className={`px-3 py-2 min-h-[40px] rounded-lg text-xs font-bold whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD] ${
                     isActive
-                      ? 'bg-white dark:bg-slate-900 text-[#0038BD] dark:text-blue-400 shadow-xs'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-slate-900 text-[#0038BD] dark:text-blue-300 shadow-xs'
+                      : 'text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white active:bg-slate-200/70 dark:active:bg-slate-700'
                   }`}
                 >
                   {tab.label}
@@ -191,7 +191,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
           <button
             type="button"
             onClick={handleToggleAllVisible}
-            className="px-3 py-2 min-h-[40px] rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
+            className="px-3 py-2 min-h-[40px] rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700 whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
           >
             {allVisibleOpen ? 'Collapse all' : 'Expand all'}
           </button>
@@ -213,7 +213,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => handleToggleItem(faq.id)}
-                className="w-full min-h-[48px] py-4 px-2 sm:px-3 flex items-start sm:items-center justify-between gap-4 text-left rounded-xl hover:bg-slate-50/90 dark:hover:bg-slate-800/50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
+                className="w-full min-h-[48px] py-4 px-2 sm:px-3 flex items-start sm:items-center justify-between gap-4 text-left rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/70 active:bg-slate-100 dark:active:bg-slate-800 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
               >
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
@@ -277,7 +277,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
           <button
             type="button"
             onClick={onOpenBooking}
-            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs sm:text-sm font-bold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF8E01]"
+            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs sm:text-sm font-bold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EF8E01]"
           >
             <span>Book Pickup</span>
             <ArrowRight className="w-4 h-4" />
@@ -287,7 +287,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
             href="https://wa.me/919404040606?text=Hi%20Joshi%20Couriers,%20I%20have%20a%20question%20about%20sending%20a%20parcel."
             target="_blank"
             rel="noopener noreferrer"
-            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white hover:text-white active:text-white text-xs sm:text-sm font-bold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
           >
             <MessageCircle className="w-4 h-4" />
             <span>WhatsApp Desk</span>
@@ -295,9 +295,9 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ onOpenBooking }) => {
 
           <a
             href="tel:+919404040606"
-            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs sm:text-sm font-bold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
+            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-800 dark:text-slate-100 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white text-xs sm:text-sm font-bold inline-flex items-center gap-2 whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0038BD]"
           >
-            <Phone className="w-4 h-4 text-[#0038BD] dark:text-blue-400" />
+            <Phone className="w-4 h-4 text-[#0038BD] dark:text-blue-300" />
             <span className="tabular-nums">+91 94040 40606</span>
           </a>
         </div>

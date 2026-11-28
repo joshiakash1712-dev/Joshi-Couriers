@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
                 <span className="text-xl font-black tracking-tight text-white leading-tight">
                   Joshi Couriers
                 </span>
-                <span className="text-[11px] font-bold text-[#EF8E01] tracking-wider uppercase">
+                <span className="text-[11px] font-bold text-amber-300 tracking-wider uppercase">
                   Fast. Reliable. Local.
                 </span>
               </div>
@@ -48,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
 
           {/* Column 2: Trusted Local Service (lg:col-span-3) */}
           <div className="lg:col-span-3 space-y-3">
-            <div className="flex items-center gap-2 text-[#EF8E01]">
+            <div className="flex items-center gap-2 text-amber-300">
               <ShieldCheck className="w-4 h-4" />
               <h4 className="text-xs font-black uppercase tracking-wider">
                 Trusted Local Service
@@ -90,7 +90,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
 
           {/* Column 3: Daily Route Schedule (lg:col-span-2) */}
           <div className="lg:col-span-2 space-y-3">
-            <div className="flex items-center gap-2 text-[#EF8E01]">
+            <div className="flex items-center gap-2 text-amber-300">
               <Clock className="w-4 h-4" />
               <h4 className="text-xs font-black uppercase tracking-wider">
                 Route Schedule
@@ -124,15 +124,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
 
           {/* Column 4: Direct Contact (lg:col-span-3) */}
           <div className="lg:col-span-3 space-y-3">
-            <h4 className="text-xs font-black uppercase tracking-wider text-[#EF8E01]">
+            <h4 className="text-xs font-black uppercase tracking-wider text-amber-300">
               Direct Contact
             </h4>
             <div className="space-y-2.5 text-xs sm:text-sm text-blue-100">
               <a
                 href="tel:+919404040606"
-                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/10 hover:bg-white/15 transition-colors text-white font-bold"
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white hover:text-white active:text-white font-bold"
               >
-                <Phone className="w-4 h-4 text-[#EF8E01]" />
+                <Phone className="w-4 h-4 text-amber-300" />
                 <span>+91 94040 40606</span>
               </a>
 
@@ -140,16 +140,16 @@ export const Footer: React.FC<FooterProps> = ({ onOpenBooking }) => {
                 href="https://wa.me/919404040606?text=Hi%20Joshi%20Couriers,%20I%20want%20to%20send%20a%20parcel%20from%20Jalna."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/10 hover:bg-white/15 transition-colors text-white font-bold"
+                className="flex items-center gap-2.5 p-2 rounded-xl bg-white/10 hover:bg-white/20 active:bg-white/25 transition-colors text-white hover:text-white active:text-white font-bold"
               >
-                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                <MessageCircle className="w-4 h-4 text-emerald-300" />
                 <span>Chat on WhatsApp</span>
               </a>
 
               <div className="pt-1">
                 <button
                   onClick={onOpenBooking}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] text-white font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                 >
                   <span>Book Doorstep Pickup</span>
                   <ArrowRight className="w-4 h-4" />

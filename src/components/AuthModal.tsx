@@ -21,6 +21,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useAuthParcel } from '../context/AuthParcelContext';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -54,6 +55,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     sendPasswordReset,
     logout 
   } = useAuthParcel();
+
+  useBodyScrollLock(isOpen);
 
   const [viewMode, setViewMode] = useState<AuthViewMode>('signin');
   const [accountType, setAccountType] = useState<'personal' | 'business'>('personal');
@@ -107,16 +110,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
+        e.stopImmediatePropagation();
         onClose();
       }
     };
     if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown, true);
     }
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [isOpen, onClose]);
 
@@ -400,7 +402,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   return (
     <div 
       id="auth-screen-backdrop"
-      className="fixed inset-0 z-50 min-h-[100dvh] w-full flex flex-col justify-between overflow-x-hidden overflow-y-auto bg-[#020B24] bg-gradient-to-b from-[#020B24] via-[#00174E] to-[#01081C] transition-colors duration-300 select-none animate-in fade-in duration-300"
+      className="fixed inset-0 z-[60] min-h-[100dvh] w-full flex flex-col justify-between overflow-x-hidden overflow-y-auto overscroll-contain bg-[#020B24] bg-gradient-to-b from-[#020B24] via-[#00174E] to-[#01081C] transition-colors duration-300 select-none animate-in fade-in duration-300"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-card-title"
@@ -481,7 +483,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           type="button"
           onClick={onClose}
           aria-label="Close authentication"
-          className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white border border-white/15 backdrop-blur-md flex items-center justify-center transition-all shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/60"
+          className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/30 text-white/90 hover:text-white active:text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition-all shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/60"
         >
           <X className="w-4 h-4" />
         </button>
@@ -563,7 +565,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="button"
                 onClick={clearFeedback}
-                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-0.5 rounded-md transition-colors"
+                className="text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white hover:bg-black/5 dark:hover:bg-white/10 active:bg-black/10 dark:active:bg-white/15 p-1 rounded-md transition-colors cursor-pointer"
                 aria-label="Dismiss message"
               >
                 <X className="w-3.5 h-3.5" />
@@ -612,22 +614,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       if (onOpenAdmin) onOpenAdmin();
                       onClose();
                     }}
-                    className="w-full p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 hover:border-[#0038BD] dark:hover:border-blue-500 text-left transition-all flex items-center justify-between group shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
+                    className="w-full p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 hover:bg-blue-50/70 dark:hover:bg-slate-800 active:bg-blue-100/80 dark:active:bg-slate-700 hover:border-[#0038BD] dark:hover:border-blue-500 text-left transition-all flex items-center justify-between group shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold">
                         <ShieldCheck className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#0038BD] dark:group-hover:text-blue-400 transition-colors">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#002888] dark:group-hover:text-blue-300 transition-colors">
                           Fleet Operations & Analytics
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300">
                           Route manifests, live status, and parcel logs
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0038BD] transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-slate-500 dark:text-slate-300 group-hover:text-[#002888] dark:group-hover:text-blue-300 transition-colors" />
                   </button>
 
                   <button
@@ -637,22 +639,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       if (onOpenCustomerParcels) onOpenCustomerParcels();
                       onClose();
                     }}
-                    className="w-full p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 hover:border-[#0038BD] dark:hover:border-blue-500 text-left transition-all flex items-center justify-between group shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
+                    className="w-full p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 hover:bg-blue-50/70 dark:hover:bg-slate-800 active:bg-blue-100/80 dark:active:bg-slate-700 hover:border-[#0038BD] dark:hover:border-blue-500 text-left transition-all flex items-center justify-between group shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#0038BD] dark:text-blue-300 flex items-center justify-center font-bold">
                         <Package className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#0038BD] dark:group-hover:text-blue-400 transition-colors">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#002888] dark:group-hover:text-blue-300 transition-colors">
                           Customer Parcel Tracking
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300">
                           Review dispatches and delivery history
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0038BD] transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-slate-500 dark:text-slate-300 group-hover:text-[#002888] dark:group-hover:text-blue-300 transition-colors" />
                   </button>
                 </>
               ) : (
@@ -663,22 +665,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     if (onOpenCustomerParcels) onOpenCustomerParcels();
                     onClose();
                   }}
-                  className="w-full p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 hover:border-[#0038BD] dark:hover:border-blue-500 text-left transition-all flex items-center justify-between group shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
+                  className="w-full p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/80 hover:bg-blue-50/70 dark:hover:bg-slate-800 active:bg-blue-100/80 dark:active:bg-slate-700 hover:border-[#0038BD] dark:hover:border-blue-500 text-left transition-all flex items-center justify-between group shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-[#0038BD] dark:text-blue-300 flex items-center justify-center font-bold">
                       <Package className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#0038BD] dark:group-hover:text-blue-400 transition-colors">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#002888] dark:group-hover:text-blue-300 transition-colors">
                         My Deliveries & Shipments
                       </p>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300">
                         Live tracking status and parcel history
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0038BD] transition-colors" />
+                  <ChevronRight className="w-4 h-4 text-slate-500 dark:text-slate-300 group-hover:text-[#002888] dark:group-hover:text-blue-300 transition-colors" />
                 </button>
               )}
 
@@ -689,7 +691,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   type="button"
                   onClick={handleSignOut}
                   disabled={loading}
-                  className="w-full h-10 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-400/40"
+                  className="w-full h-10 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-red-700 dark:hover:text-red-300 active:text-red-800 dark:active:text-red-200 hover:bg-red-50/80 dark:hover:bg-red-950/40 active:bg-red-100/80 dark:active:bg-red-950/60 transition-colors flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-400/40"
                 >
                   {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogOut className="w-3.5 h-3.5" />}
                   <span>{loading ? 'Signing out...' : 'Sign out from account'}</span>
@@ -723,7 +725,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         clearFeedback();
                         setResetEmailSent(false);
                       }}
-                      className="w-full h-11 rounded-xl bg-slate-950 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-semibold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full h-11 rounded-xl bg-slate-950 hover:bg-slate-800 active:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 dark:active:bg-slate-200 text-white hover:text-white active:text-white dark:text-slate-950 dark:hover:text-slate-950 dark:active:text-slate-950 font-semibold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
                     >
                       Return to Sign In
                     </button>
@@ -732,7 +734,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       type="button"
                       onClick={(e) => handleEmailSubmit(e)}
                       disabled={loading}
-                      className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white py-2 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                      className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-[#0038BD] dark:active:text-blue-300 py-2 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                       <span>Resend recovery email</span>
@@ -775,7 +777,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     id="auth-send-reset-btn"
                     type="submit"
                     disabled={loading}
-                    className="w-full h-11 rounded-xl bg-slate-950 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-semibold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/50"
+                    className="w-full h-11 rounded-xl bg-slate-950 hover:bg-slate-800 active:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 dark:active:bg-slate-200 text-white hover:text-white active:text-white dark:text-slate-950 dark:hover:text-slate-950 dark:active:text-slate-950 font-semibold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/50"
                   >
                     {loading ? (
                       <div className="flex items-center gap-2">
@@ -794,7 +796,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         setViewMode('signin');
                         clearFeedback();
                       }}
-                      className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors cursor-pointer"
+                      className="text-xs text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-[#0038BD] dark:active:text-blue-300 font-medium transition-colors cursor-pointer"
                     >
                       Back to Sign In
                     </button>
@@ -816,8 +818,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     onClick={() => setAccountType('personal')}
                     className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                       accountType === 'personal'
-                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
-                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                        ? 'bg-white dark:bg-slate-700 text-slate-950 dark:text-white shadow-2xs'
+                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
                     }`}
                   >
                     Personal
@@ -827,8 +829,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     onClick={() => setAccountType('business')}
                     className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                       accountType === 'business'
-                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
-                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                        ? 'bg-white dark:bg-slate-700 text-slate-950 dark:text-white shadow-2xs'
+                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
                     }`}
                   >
                     Business or Merchant
@@ -961,7 +963,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         setViewMode('forgot_password');
                         clearFeedback();
                       }}
-                      className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors font-medium cursor-pointer"
+                      className="text-xs text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-[#0038BD] dark:active:text-blue-300 transition-colors font-medium cursor-pointer"
                     >
                       Forgot password?
                     </button>
@@ -992,7 +994,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors p-1"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white cursor-pointer transition-colors p-1"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1006,7 +1008,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   id="auth-primary-submit-btn"
                   type="submit"
                   disabled={loading}
-                  className="w-full h-11 rounded-xl bg-slate-950 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-semibold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/50"
+                  className="w-full h-11 rounded-xl bg-slate-950 hover:bg-slate-800 active:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 dark:active:bg-slate-200 text-white hover:text-white active:text-white dark:text-slate-950 dark:hover:text-slate-950 dark:active:text-slate-950 font-semibold text-sm transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/50"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2">
@@ -1034,7 +1036,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full h-11 rounded-xl bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-750 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-xs active:scale-[0.99] cursor-pointer disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
+                className="w-full h-11 rounded-xl bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 border border-slate-200/80 dark:border-slate-700/80 text-slate-800 dark:text-slate-100 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all shadow-xs active:scale-[0.99] cursor-pointer disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[#0038BD]/40"
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1048,7 +1050,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {/* Mode Toggle Link */}
               <div className="text-center pt-3">
                 {viewMode === 'signin' ? (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     Don't have a Joshi Couriers account?{' '}
                     <button
                       id="auth-switch-to-register"
@@ -1057,13 +1059,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         setViewMode('register');
                         clearFeedback();
                       }}
-                      className="text-[#0038BD] dark:text-blue-400 font-semibold hover:underline cursor-pointer"
+                      className="text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white font-semibold hover:underline cursor-pointer"
                     >
                       Create account
                     </button>
                   </p>
                 ) : (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     Already have an account?{' '}
                     <button
                       id="auth-switch-to-signin"
@@ -1072,7 +1074,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         setViewMode('signin');
                         clearFeedback();
                       }}
-                      className="text-[#0038BD] dark:text-blue-400 font-semibold hover:underline cursor-pointer"
+                      className="text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white font-semibold hover:underline cursor-pointer"
                     >
                       Sign In
                     </button>

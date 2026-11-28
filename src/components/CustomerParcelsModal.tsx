@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   X, 
   Package, 
@@ -28,6 +28,7 @@ import {
 import { useAuthParcel } from '../context/AuthParcelContext';
 import { useParcelNotifications } from '../context/NotificationContext';
 import { useToast } from '../hooks/useToast';
+import { useBodyScrollLock, useModalScrollForwarding } from '../hooks/useBodyScrollLock';
 import { ParcelItem, ParcelStatus } from '../types';
 
 interface CustomerParcelsModalProps {
@@ -47,6 +48,19 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
   const { isSupported, permission, alertsEnabled, toggleAlerts } = useParcelNotifications();
   const isAlertsActive = isSupported && permission === 'granted' && alertsEnabled;
   const toast = useToast();
+  const backdropRef = useRef<HTMLDivElement>(null);
+  useBodyScrollLock(isOpen);
+  useModalScrollForwarding(backdropRef, isOpen);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
   const [viewMode, setViewMode] = useState<'consignments' | 'reports'>('consignments');
   const [reportTimeframe, setReportTimeframe] = useState<'this_month' | 'past_6_months' | 'yearly' | 'all_time'>('this_month');
   const [searchQuery, setSearchQuery] = useState('');
@@ -197,9 +211,15 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
   const totalFreight = userParcels.reduce((sum, p) => sum + p.fare, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+    <div
+      ref={backdropRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs overflow-hidden overscroll-none touch-none min-h-[100dvh]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div 
-        className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden my-4 sm:my-8 max-h-[90dvh] flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden max-h-[90dvh] flex flex-col touch-auto animate-in fade-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
       >
@@ -208,14 +228,14 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
           <button 
             onClick={onClose}
             aria-label="Close modal"
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors text-white"
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 active:bg-white/30 flex items-center justify-center transition-colors text-white/90 hover:text-white active:text-white cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pr-10">
             <div>
-              <div className="flex items-center gap-2 text-[#EF8E01] font-bold text-xs uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider mb-1">
                 <Package className="w-4 h-4" />
                 <span>Regular Sender Dashboard</span>
               </div>
@@ -241,7 +261,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                   onClose();
                   onOpenBooking();
                 }}
-                className="px-3.5 py-2 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all"
+                className="px-3.5 py-2 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>New Pickup</span>
@@ -271,7 +291,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
               </span>
               <button
                 onClick={onOpenAuth}
-                className="text-xs font-bold text-[#0038BD] dark:text-blue-400 hover:underline"
+                className="text-xs font-bold text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white hover:underline cursor-pointer"
               >
                 Sign In Now
               </button>
@@ -286,8 +306,8 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                   onClick={toggleAlerts}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer min-h-[34px] ${
                     isAlertsActive
-                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
-                      : 'bg-white dark:bg-slate-800 text-[#0038BD] dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100/60 dark:hover:bg-slate-700'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/70 hover:text-emerald-950 dark:hover:text-emerald-100 active:bg-emerald-200 dark:active:bg-emerald-800/80 active:text-emerald-950 dark:active:text-white'
+                      : 'bg-white dark:bg-slate-800 text-[#0038BD] dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:bg-blue-100/70 dark:hover:bg-slate-700 hover:text-[#002888] dark:hover:text-white active:bg-blue-200/70 dark:active:bg-slate-600 active:text-[#002070] dark:active:text-white'
                   }`}
                 >
                   {isAlertsActive ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
@@ -302,14 +322,14 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
               )}
               <button
                 onClick={onOpenAuth}
-                className="text-xs font-bold text-[#0038BD] dark:text-blue-400 hover:underline cursor-pointer"
+                className="text-xs font-bold text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white hover:underline cursor-pointer"
               >
                 Switch Account
               </button>
               <span className="text-slate-300 dark:text-slate-600">•</span>
               <button
                 onClick={logout}
-                className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline cursor-pointer"
+                className="text-xs font-bold text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 active:text-red-900 dark:active:text-white hover:underline cursor-pointer"
               >
                 Log Out
               </button>
@@ -324,8 +344,8 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
             onClick={() => setViewMode('consignments')}
             className={`py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 cursor-pointer transition-colors ${
               viewMode === 'consignments'
-                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-300 dark:border-blue-400 hover:text-[#002888] dark:hover:text-blue-200'
+                : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 active:bg-slate-100 dark:active:bg-slate-800 active:text-slate-950 dark:active:text-white'
             }`}
           >
             <Package className="w-4 h-4" />
@@ -337,11 +357,11 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
             onClick={() => setViewMode('reports')}
             className={`py-3 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 flex items-center gap-2 cursor-pointer transition-colors ${
               viewMode === 'reports'
-                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-300 dark:border-blue-400 hover:text-[#002888] dark:hover:text-blue-200'
+                : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 active:bg-slate-100 dark:active:bg-slate-800 active:text-slate-950 dark:active:text-white'
             }`}
           >
-            <BarChart3 className="w-4 h-4 text-[#EF8E01]" />
+            <BarChart3 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
             <span>Delivery Reports &amp; Analytics</span>
           </button>
         </div>
@@ -406,7 +426,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-bold"
+                    className="absolute right-3 top-2 text-xs text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white font-bold cursor-pointer"
                   >
                     Clear
                   </button>
@@ -417,30 +437,30 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
               <div className="flex items-center gap-1.5 self-start sm:self-auto">
                 <button
                   onClick={() => setStatusFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                     statusFilter === 'all'
-                      ? 'bg-[#0038BD] text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-300 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white'
                   }`}
                 >
                   All ({userParcels.length})
                 </button>
                 <button
                   onClick={() => setStatusFilter('active')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                     statusFilter === 'active'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-amber-700 hover:bg-amber-800 active:bg-amber-900 text-white hover:text-white active:text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-300 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white'
                   }`}
                 >
                   Active ({activeCount})
                 </button>
                 <button
                   onClick={() => setStatusFilter('delivered')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                     statusFilter === 'delivered'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white hover:text-white active:text-white'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-300 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white'
                   }`}
                 >
                   Delivered ({deliveredCount})
@@ -449,7 +469,10 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
             </div>
 
             {/* Parcel List (Scrollable Area) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div
+          data-modal-scroll="true"
+          className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4"
+        >
           {filteredParcels.length === 0 ? (
             <div className="text-center py-12 px-4">
               <Package className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
@@ -466,7 +489,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                   onClose();
                   onOpenBooking();
                 }}
-                className="px-4 py-2 rounded-xl bg-[#EF8E01] text-white text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 <span>Book a Doorstep Pickup Now</span>
@@ -496,7 +519,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                           </span>
                           <button
                             onClick={() => handleCopy(parcel.id)}
-                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1"
+                            className="text-slate-500 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white hover:bg-slate-200/70 dark:hover:bg-slate-700 active:bg-slate-300/70 dark:active:bg-slate-600 rounded-md p-1 transition-colors cursor-pointer"
                             title="Copy Tracking ID"
                           >
                             <Copy className="w-3.5 h-3.5" />
@@ -624,7 +647,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                   <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between gap-2">
                     <button
                       onClick={() => setExpandedParcelId(isExpanded ? null : parcel.id)}
-                      className="text-xs font-bold text-[#0038BD] dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 flex items-center gap-1"
+                      className="text-xs font-bold text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white flex items-center gap-1 cursor-pointer transition-colors"
                     >
                       <span>{isExpanded ? 'Hide Timeline' : 'View Live Timeline'}</span>
                       {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -642,10 +665,10 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white font-semibold text-xs flex items-center gap-1 transition-colors"
                         title="Share on WhatsApp"
                       >
-                        <Share2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                        <Share2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
                         <span className="hidden sm:inline">WhatsApp Receipt</span>
                       </a>
 
@@ -654,7 +677,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                           onClose();
                           onOpenBooking();
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#EF8E01] hover:bg-[#d88001] text-white font-bold text-xs flex items-center gap-1 shadow-2xs"
+                        className="px-3 py-1.5 rounded-lg bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 font-bold text-xs flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
                       >
                         <RefreshCw className="w-3 h-3" />
                         <span>Re-book Pickup</span>
@@ -669,7 +692,10 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
           </>
         ) : (
           /* Delivery Reports & Analytics View */
-          <div className="p-4 sm:p-6 space-y-5 flex-1 overflow-y-auto">
+          <div
+            data-modal-scroll="true"
+            className="p-4 sm:p-6 space-y-5 flex-1 overflow-y-auto overscroll-contain"
+          >
             {/* Timeframe selector header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-amber-50/50 dark:from-slate-800 dark:to-slate-800/60 border border-blue-100 dark:border-slate-700">
               <div>
@@ -698,8 +724,8 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                     onClick={() => setReportTimeframe(tf.key as any)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       reportTimeframe === tf.key
-                        ? 'bg-[#0038BD] text-white shadow-xs'
-                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                        ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-200 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     {tf.label}
@@ -709,7 +735,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyReportStatement}
-                  className="px-3 py-1.5 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors ml-1"
+                  className="px-3 py-1.5 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors ml-1"
                 >
                   <Copy className="w-3.5 h-3.5" />
                   <span>{copiedReport ? 'Copied' : 'Copy Statement'}</span>
@@ -839,7 +865,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setViewMode('consignments')}
-                  className="text-xs font-bold text-[#0038BD] dark:text-blue-400 hover:underline cursor-pointer"
+                  className="text-xs font-bold text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white hover:underline cursor-pointer"
                 >
                   Manage All &rarr;
                 </button>
@@ -898,7 +924,7 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('consignments')}
-                className="text-[#0038BD] dark:text-blue-400 font-bold hover:underline shrink-0 cursor-pointer"
+                className="text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white font-bold hover:underline shrink-0 cursor-pointer"
               >
                 View Consignments &rarr;
               </button>
@@ -907,13 +933,13 @@ export const CustomerParcelsModal: React.FC<CustomerParcelsModalProps> = ({
         )}
 
         {/* Footer info */}
-        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+        <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300 shrink-0">
           <p>
             Daily Morning Delivery: <strong className="text-slate-800 dark:text-slate-200">Jalna ➔ Partur (6:30 - 8:30 AM)</strong>.
           </p>
           <a
             href="tel:+919404040606"
-            className="font-bold text-[#0038BD] dark:text-blue-400 hover:underline flex items-center gap-1"
+            className="font-bold text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white hover:underline flex items-center gap-1"
           >
             <Phone className="w-3.5 h-3.5" />
             <span>Driver Hotline: +91 94040 40606</span>

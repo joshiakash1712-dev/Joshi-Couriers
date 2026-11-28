@@ -164,23 +164,23 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
   const talukas: Array<'all' | 'Jalna' | 'Partur'> = ['all', 'Jalna', 'Partur'];
 
   return (
-    <div className="relative flex-1" ref={containerRef}>
+    <div className="relative flex-1 flex flex-col h-full" ref={containerRef}>
       {/* Label with details */}
-      <div className="flex items-center justify-between mb-1.5">
-        <label htmlFor={id} className="text-xs font-bold text-slate-800 flex items-center gap-1">
+      <div className="flex items-center justify-between gap-2 mb-1.5 min-h-[20px]">
+        <label htmlFor={id} className="text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1 whitespace-nowrap">
           <span>{label}</span>
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-red-500 dark:text-red-400">*</span>}
         </label>
         {sublabel ? (
-          <span className="text-[11px] text-slate-500 font-medium">{sublabel}</span>
+          <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap">{sublabel}</span>
         ) : (
-          <span className="text-[10px] text-slate-400 font-medium">
+          <span className="text-[11px] text-slate-600 dark:text-slate-300 font-semibold whitespace-nowrap shrink-0">
             {currentLocation.taluka} • {currentLocation.distanceKm} km
           </span>
         )}
       </div>
 
-      {/* Selected Location Display Button (Mobile-friendly, large target) */}
+      {/* Selected Location Display Button (Equal height, crisp dark/light hover) */}
       <button
         type="button"
         id={id}
@@ -188,21 +188,21 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
         aria-expanded={isOpen}
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
-        className={`w-full min-h-[52px] flex items-center justify-between text-left px-3.5 py-2.5 rounded-xl border bg-white dark:bg-slate-800 shadow-2xs transition-all active:scale-[0.99] touch-manipulation ${
+        className={`w-full flex-1 min-h-[68px] flex items-center justify-between text-left px-3.5 py-3 rounded-xl border transition-colors active:scale-[0.99] touch-manipulation cursor-pointer ${
           isOpen
-            ? 'border-[#0038BD] dark:border-blue-500 ring-2 ring-[#0038BD]/20 bg-blue-50/20 dark:bg-blue-950/20 shadow-sm'
-            : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 hover:bg-slate-50/70 dark:hover:bg-slate-750'
+            ? 'border-[#0038BD] dark:border-blue-400 ring-2 ring-[#0038BD]/20 dark:ring-blue-400/25 bg-blue-50/40 dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm'
+            : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:border-slate-400 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/70 hover:text-slate-950 dark:hover:text-white active:bg-slate-100 dark:active:bg-slate-700 active:text-slate-950 dark:active:text-white shadow-2xs'
         }`}
       >
-        <div className="flex items-center gap-3 min-w-0 pr-2">
+        <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
           {/* Hub/Stop Icon Badge */}
           <div
-            className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
               currentLocation.type === 'hub'
                 ? 'bg-[#0038BD] text-white shadow-2xs'
                 : currentLocation.type === 'junction'
-                ? 'bg-amber-500 text-white shadow-2xs'
-                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                ? 'bg-amber-500 text-slate-950 shadow-2xs'
+                : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
             }`}
           >
             {currentLocation.type === 'hub' ? (
@@ -214,35 +214,36 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline gap-1.5 leading-tight flex-wrap">
-              <span className="font-bold text-slate-900 dark:text-slate-100 text-sm truncate">
+          <div className="min-w-0 flex-1 space-y-0.5">
+            <div className="flex items-center gap-1.5 leading-tight min-w-0">
+              <span className="font-bold text-slate-900 dark:text-white text-sm truncate">
                 {currentLocation.name}
               </span>
-              <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold shrink-0">
-                ({currentLocation.marathiName})
-              </span>
               {currentLocation.type === 'hub' && (
-                <span className="text-[9px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-950/70 text-[#0038BD] dark:text-blue-300 px-1.5 py-0.2 rounded-md">
+                <span className="shrink-0 text-[9px] font-black uppercase tracking-wider bg-blue-100 dark:bg-blue-900/80 text-[#0038BD] dark:text-blue-200 px-1.5 py-0.5 rounded-md">
                   Hub
+                </span>
+              )}
+              {currentLocation.type === 'junction' && (
+                <span className="shrink-0 text-[9px] font-black uppercase tracking-wider bg-amber-100 dark:bg-amber-900/70 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 rounded-md">
+                  Junction
                 </span>
               )}
             </div>
 
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 font-medium truncate">
-              <span>Taluka: <strong className="text-slate-700 dark:text-slate-300">{currentLocation.taluka}</strong></span>
-              <span>•</span>
-              <span className="font-mono">PIN {currentLocation.pincode}</span>
+            <div className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-1.5 font-medium min-w-0">
+              <span className="truncate">{currentLocation.marathiName}</span>
+              <span className="text-slate-400 dark:text-slate-500 shrink-0">•</span>
+              <span className="font-mono shrink-0 text-slate-700 dark:text-slate-200">
+                PIN {currentLocation.pincode}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 pl-1">
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-700/60 px-1.5 py-0.5 rounded-md hidden sm:inline">
-            {ROUTE_LOCATIONS.length} stops
-          </span>
+        <div className="flex items-center shrink-0 pl-1">
           <ChevronDown
-            className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+            className={`w-4 h-4 text-slate-500 dark:text-slate-300 shrink-0 transition-transform duration-200 ${
               isOpen ? 'rotate-180 text-[#0038BD] dark:text-blue-400' : ''
             }`}
           />
@@ -271,7 +272,7 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  className="absolute right-2.5 p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white transition-colors cursor-pointer"
                   aria-label="Clear search"
                 >
                   <X className="w-4 h-4" />
@@ -296,16 +297,16 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
                       setSelectedTaluka(t);
                       setHighlightedIndex(0);
                     }}
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-lg whitespace-nowrap transition-all touch-manipulation min-h-[32px] flex items-center gap-1 ${
+                    className={`text-[11px] font-bold px-2.5 py-1 rounded-lg whitespace-nowrap transition-all touch-manipulation min-h-[32px] flex items-center gap-1 cursor-pointer ${
                       isActive
-                        ? 'bg-[#0038BD] text-white shadow-2xs scale-[1.02]'
-                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                        ? 'bg-[#0038BD] text-white hover:bg-[#002d99] hover:text-white active:bg-[#002070] active:text-white shadow-2xs scale-[1.02]'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200/80 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-300 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white border border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     <span>{t === 'all' ? 'All Corridor' : `${t}`}</span>
                     <span
                       className={`text-[9px] px-1 py-0.2 rounded-md ${
-                        isActive ? 'bg-blue-800 text-blue-100' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                        isActive ? 'bg-blue-800 text-blue-100' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
                       }`}
                     >
                       {count}
@@ -349,12 +350,12 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
                       }
                     }}
                     onMouseEnter={() => setHighlightedIndex(idx)}
-                    className={`min-h-[54px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all flex items-center justify-between gap-3 touch-manipulation active:bg-blue-50/80 select-none ${
+                    className={`min-h-[54px] px-3.5 py-2.5 rounded-xl cursor-pointer transition-all flex items-center justify-between gap-3 touch-manipulation active:bg-blue-50/80 dark:active:bg-blue-900/60 select-none ${
                       isSelected
-                        ? 'bg-[#0038BD]/10 dark:bg-blue-950/50 border border-[#0038BD]/25 dark:border-blue-500/40 text-[#0038BD] dark:text-blue-300'
+                        ? 'bg-[#0038BD]/10 dark:bg-blue-950/60 border border-[#0038BD]/25 dark:border-blue-500/40 text-[#002888] dark:text-blue-200 hover:text-[#002888] dark:hover:text-white active:text-[#002070] dark:active:text-white'
                         : isHighlighted
-                        ? 'bg-slate-100/90 dark:bg-slate-700/60 text-slate-900 dark:text-slate-100'
-                        : 'hover:bg-slate-50/80 dark:hover:bg-slate-700/40 text-slate-800 dark:text-slate-200'
+                        ? 'bg-slate-100/90 dark:bg-slate-700/70 text-slate-950 dark:text-white hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
+                        : 'hover:bg-slate-50/90 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
                     } ${isExcluded ? 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-800' : ''}`}
                   >
                     {/* Left Icon + Names */}
@@ -365,7 +366,7 @@ export const LocationSearchSelect: React.FC<LocationSearchSelectProps> = ({
                           loc.type === 'hub'
                             ? 'bg-[#0038BD] text-white shadow-2xs'
                             : loc.type === 'junction'
-                            ? 'bg-amber-500 text-white shadow-2xs'
+                            ? 'bg-amber-500 text-slate-950 shadow-2xs'
                             : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
                         }`}
                       >

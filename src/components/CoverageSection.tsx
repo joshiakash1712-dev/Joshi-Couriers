@@ -118,10 +118,10 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
             </div>
             <button
               onClick={() => onOpenBooking('jalna', 'partur')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs sm:text-sm font-bold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
             >
               <span>Book Full Route Pickup</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
           </div>
 
@@ -140,12 +140,12 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
                   <button
                     key={loc.id}
                     onClick={() => setSelectedLocation(loc)}
-                    className="flex flex-col items-center group relative z-10 focus:outline-none"
+                    className="flex flex-col items-center group relative z-10 focus:outline-none cursor-pointer"
                   >
                     <div
                       className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200 shadow-sm ${
                         isSelected
-                          ? 'bg-[#EF8E01] text-white ring-4 ring-[#EF8E01]/30 scale-110'
+                          ? 'bg-[#EF8E01] text-slate-950 ring-4 ring-[#EF8E01]/30 scale-110'
                           : isHub
                           ? 'bg-[#0038BD] text-white group-hover:scale-105'
                           : isJunction
@@ -156,7 +156,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
                       <MapPin className="w-5 h-5" />
                     </div>
                     
-                    <span className={`text-xs font-black mt-2 text-center whitespace-nowrap ${isSelected ? 'text-[#EF8E01]' : 'text-slate-900'}`}>
+                    <span className={`text-xs font-black mt-2 text-center whitespace-nowrap ${isSelected ? 'text-amber-800' : 'text-slate-900'}`}>
                       {loc.name}
                     </span>
                     <span className="text-[10px] font-bold text-slate-500 font-hindi">
@@ -197,7 +197,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
 
             <button
               onClick={() => onOpenBooking(selectedLocation.id, selectedLocation.id === 'jalna' ? 'partur' : 'jalna')}
-              className="px-4 py-2 bg-[#0038BD] hover:bg-[#002d99] text-white font-bold rounded-xl transition-all shadow-2xs active:scale-95 shrink-0"
+              className="px-4 py-2 bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white font-bold rounded-xl transition-all shadow-2xs active:scale-95 shrink-0 cursor-pointer"
             >
               Book from {selectedLocation.name} ➔
             </button>
@@ -206,15 +206,15 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
 
         {/* Taluka Filter Buttons */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <span className="text-xs font-bold text-slate-500 mr-2">Filter by Taluka:</span>
+          <span className="text-xs font-bold text-slate-600 mr-2">Filter by Taluka:</span>
           {(['all', 'Jalna', 'Partur'] as const).map((taluka) => (
             <button
               key={taluka}
               onClick={() => setFilterTaluka(taluka)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 filterTaluka === taluka
-                  ? 'bg-[#0038BD] text-white shadow-xs'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-xs'
+                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-950 active:bg-slate-200 active:text-slate-950'
               }`}
             >
               {taluka === 'all' ? `All ${ROUTE_LOCATIONS.length} Locations` : `${taluka} Taluka`}
@@ -245,7 +245,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2.5">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-2xs ${
-                        isHub ? 'bg-[#0038BD]' : isJunction ? 'bg-slate-900 text-[#EF8E01]' : 'bg-orange-500'
+                        isHub ? 'bg-[#0038BD]' : isJunction ? 'bg-slate-900 text-amber-400' : 'bg-amber-700'
                       }`}>
                         <MapPin className="w-5 h-5 text-white" />
                       </div>
@@ -281,7 +281,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">Distance from Jalna:</span>
-                      <span className="font-bold text-[#EF8E01]">~{loc.distanceKm} km</span>
+                      <span className="font-bold text-amber-800">~{loc.distanceKm} km</span>
                     </div>
                   </div>
 
@@ -307,7 +307,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
                   </span>
                   <button
                     onClick={() => onOpenBooking(loc.id, loc.id === 'jalna' ? 'partur' : 'jalna')}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#0038BD] hover:text-[#EF8E01] transition-colors"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#0038BD] hover:text-[#002888] active:text-slate-950 transition-colors cursor-pointer"
                   >
                     <span>Book</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ export const CoverageSection: React.FC<CoverageSectionProps> = ({ onOpenBooking 
             </div>
             <button
               onClick={() => onOpenBooking()}
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white bg-[#0038BD] hover:bg-[#002d99] px-5 py-3 rounded-xl transition-all shadow-sm active:scale-95"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white hover:text-white active:text-white bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] px-5 py-3 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
             >
               <span>Book Parcel Delivery</span>
               <ArrowRight className="w-4 h-4" />

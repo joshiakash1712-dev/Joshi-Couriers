@@ -161,7 +161,7 @@ export const CustomerTrust: React.FC<CustomerTrustProps> = ({ onOpenBooking }) =
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 dark:border-slate-800">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#EF8E01] bg-orange-50 dark:bg-orange-950/60 px-3 py-1 rounded-full border border-orange-100 dark:border-orange-900/60">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-orange-50 dark:bg-orange-950/60 px-3 py-1 rounded-full border border-orange-100 dark:border-orange-900/60">
                 WHY JOSHI COURIERS WINS
               </span>
               <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 mt-2">
@@ -170,7 +170,7 @@ export const CustomerTrust: React.FC<CustomerTrustProps> = ({ onOpenBooking }) =
             </div>
             <button
               onClick={onOpenBooking}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0038BD] hover:bg-[#002d99] text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition-colors cursor-pointer"
             >
               <span>Switch to Same-Day Delivery</span>
               <ArrowRight className="w-4 h-4" />

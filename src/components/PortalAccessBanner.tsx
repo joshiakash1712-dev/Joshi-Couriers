@@ -108,7 +108,7 @@ export const PortalAccessBanner: React.FC<PortalAccessBannerProps> = ({
           {currentUser && currentUser.role === 'customer' ? (
             <button
               onClick={onOpenCustomerParcels}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#0038BD] hover:bg-[#002d99] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
             >
               <Package className="w-4 h-4" />
               <span>View My Entire Parcel List ({userParcels.length})</span>
@@ -118,14 +118,14 @@ export const PortalAccessBanner: React.FC<PortalAccessBannerProps> = ({
             <div className="w-full flex flex-col sm:flex-row items-center gap-2.5">
               <button
                 onClick={onOpenAuth}
-                className="w-full sm:w-auto flex-1 px-4 py-2.5 rounded-xl bg-[#0038BD] hover:bg-[#002d99] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto flex-1 px-4 py-2.5 rounded-xl bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
               >
                 <Users className="w-4 h-4" />
                 <span>Sign In as Regular Sender</span>
               </button>
               <button
                 onClick={onOpenCustomerParcels}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-800 dark:text-slate-100 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white text-xs font-bold transition-all active:scale-95 cursor-pointer"
               >
                 View Parcel Hub
               </button>
@@ -181,7 +181,7 @@ export const PortalAccessBanner: React.FC<PortalAccessBannerProps> = ({
         <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={onOpenAdmin}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
           >
             <BarChart3 className="w-4 h-4" />
             <span>Open Admin Analytics &amp; Manifest</span>

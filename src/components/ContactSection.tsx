@@ -46,7 +46,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
                   href="https://wa.me/919404040606"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute bottom-2 right-0 w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform ring-4 ring-white"
+                  className="absolute bottom-2 right-0 w-12 h-12 rounded-full bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white hover:text-white active:text-white flex items-center justify-center shadow-lg hover:scale-110 transition-all ring-4 ring-white"
                   title="Chat on WhatsApp"
                 >
                   <MessageCircle className="w-6 h-6 fill-white" />
@@ -71,22 +71,22 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
                   target="_blank"
                   rel="noopener noreferrer"
                   id="contact-section-whatsapp-btn"
-                  className="inline-flex flex-col items-center justify-center px-6 py-3.5 rounded-2xl border-2 border-[#10B981] bg-white hover:bg-emerald-50 text-emerald-800 shadow-xs hover:shadow-md transition-all group w-full sm:w-auto"
+                  className="inline-flex flex-col items-center justify-center px-6 py-3.5 rounded-2xl border-2 border-emerald-600 bg-white hover:bg-emerald-50 active:bg-emerald-100 text-emerald-900 hover:text-emerald-950 active:text-emerald-950 shadow-xs hover:shadow-md transition-all group w-full sm:w-auto"
                 >
-                  <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-emerald-700 group-hover:text-emerald-800">
-                    <MessageCircle className="w-5 h-5 text-[#25D366] fill-[#25D366]/20" />
+                  <div className="flex items-center gap-2 font-bold text-sm sm:text-base text-emerald-800 group-hover:text-emerald-950 group-active:text-emerald-950">
+                    <MessageCircle className="w-5 h-5 text-emerald-700 fill-emerald-600/20" />
                     <span>Contact Us on WhatsApp</span>
                   </div>
-                  <span className="text-[11px] font-mono text-emerald-600">wa.me/919404040606</span>
+                  <span className="text-[11px] font-mono text-emerald-800">wa.me/919404040606</span>
                 </a>
 
                 {/* Instant Book Pickup Button */}
                 <button
                   onClick={onOpenBooking}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl font-bold text-sm text-white bg-[#EF8E01] hover:bg-[#d88001] shadow-md shadow-[#EF8E01]/20 transition-all active:scale-95 w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl font-bold text-sm text-slate-950 hover:text-slate-950 active:text-slate-950 bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] shadow-md shadow-[#EF8E01]/20 transition-all active:scale-95 cursor-pointer w-full sm:w-auto"
                 >
                   <span>Book Pickup</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
                 </button>
               </div>
             </div>
@@ -100,7 +100,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
                 </div>
                 <div>
                   <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Phone</span>
-                  <a href="tel:+919404040606" className="text-sm sm:text-base font-bold text-slate-900 hover:text-[#0038BD]">
+                  <a href="tel:+919404040606" className="text-sm sm:text-base font-bold text-slate-900 hover:text-[#002888] active:text-[#002070] transition-colors">
                     +91 94040 40606
                   </a>
                 </div>
@@ -117,7 +117,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
                     href="https://wa.me/919404040606"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm sm:text-base font-bold text-slate-900 hover:text-emerald-700"
+                    className="text-sm sm:text-base font-bold text-slate-900 hover:text-emerald-800 active:text-emerald-950 transition-colors"
                   >
                     +91 94040 40606
                   </a>
@@ -126,7 +126,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenBooking })
 
               {/* Location */}
               <div className="flex items-start gap-3.5">
-                <div className="w-9 h-9 rounded-xl bg-orange-100/80 text-[#EF8E01] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-9 h-9 rounded-xl bg-orange-100/80 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>

@@ -28,10 +28,10 @@ export const HeroVanIllustration: React.FC<HeroVanIllustrationProps> = ({ onOpen
 
           <button
             onClick={() => setActiveDirection(prev => prev === 'jalna-to-partur' ? 'partur-to-jalna' : 'jalna-to-partur')}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-slate-700 bg-white hover:bg-slate-100 hover:text-[#0038BD] rounded-lg border border-slate-200 shadow-2xs transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-slate-700 bg-white hover:bg-slate-100 active:bg-slate-200 hover:text-[#002888] active:text-[#002070] rounded-lg border border-slate-200 shadow-2xs transition-all active:scale-95 cursor-pointer"
             title="Switch route direction"
           >
-            <ArrowRightLeft className="w-3 h-3 text-[#EF8E01]" />
+            <ArrowRightLeft className="w-3 h-3 text-amber-700" />
             <span className="font-semibold">{activeDirection === 'jalna-to-partur' ? 'Jalna ➔ Partur' : 'Partur ➔ Jalna'}</span>
           </button>
         </div>
@@ -93,15 +93,15 @@ export const HeroVanIllustration: React.FC<HeroVanIllustrationProps> = ({ onOpen
           {/* Partur Pin */}
           <div className="flex flex-col items-center z-10">
             <div className="relative group cursor-pointer">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#EF8E01] text-white flex items-center justify-center shadow-md ring-4 ring-[#EF8E01]/20 group-hover:scale-110 transition-transform">
-                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white/20" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#EF8E01] text-slate-950 flex items-center justify-center shadow-md ring-4 ring-[#EF8E01]/20 group-hover:scale-110 transition-transform">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950 fill-slate-950/15" />
               </div>
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#0038BD] border-2 border-white rounded-full" />
             </div>
             <span className="text-xs sm:text-sm font-black text-slate-900 mt-1.5 tracking-wider">
               PARTUR
             </span>
-            <span className="text-[9px] font-bold text-[#EF8E01] bg-orange-50 px-1.5 py-0.2 rounded border border-orange-100">
+            <span className="text-[9px] font-bold text-amber-800 bg-orange-50 px-1.5 py-0.2 rounded border border-orange-200">
               HUB 02
             </span>
           </div>

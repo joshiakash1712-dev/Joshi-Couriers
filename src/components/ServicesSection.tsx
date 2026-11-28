@@ -37,7 +37,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
       icon: <ShoppingBag className="w-6 h-6 text-[#EF8E01]" strokeWidth={2.2} />,
       price: 'From ₹60',
       badge: 'Merchant Special',
-      badgeColor: 'bg-orange-100 text-[#EF8E01] border-orange-200',
+      badgeColor: 'bg-orange-100 text-amber-900 border-orange-200',
     },
     {
       id: 'parts',
@@ -133,7 +133,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
                 <h3 className="text-lg font-black text-slate-900 group-hover:text-[#0038BD] transition-colors leading-snug">
                   {service.title}
                 </h3>
-                <span className="text-xs font-bold text-[#EF8E01] block mb-2 font-hindi">
+                <span className="text-xs font-bold text-amber-800 block mb-2 font-hindi">
                   {service.marathiTitle}
                 </span>
 
@@ -160,7 +160,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
                 </span>
                 <button
                   onClick={onOpenBooking}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0038BD] group-hover:text-[#EF8E01] transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0038BD] group-hover:text-[#002888] hover:text-[#002070] active:text-slate-950 transition-colors cursor-pointer"
                 >
                   <span>Book Pickup</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -178,7 +178,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
               <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-[#EF8E01] mb-4">
                 <Zap className="w-6 h-6" />
               </div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#EF8E01] text-white inline-block mb-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#EF8E01] text-slate-950 inline-block mb-2">
                 Business &amp; Wholesale
               </span>
               <h3 className="text-lg sm:text-xl font-black text-white leading-snug">
@@ -192,7 +192,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBooking 
             <div className="pt-6 relative z-10">
               <button
                 onClick={onOpenBooking}
-                className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-900 bg-white hover:bg-blue-50 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95"
+                className="w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-950 hover:text-slate-950 active:text-slate-950 bg-white hover:bg-blue-50 active:bg-blue-100 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95 cursor-pointer"
               >
                 <span>Open Merchant Account</span>
                 <ArrowRight className="w-4 h-4 text-[#0038BD]" />

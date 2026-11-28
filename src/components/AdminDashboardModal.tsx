@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   X, 
   TrendingUp, 
@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAuthParcel } from '../context/AuthParcelContext';
 import { useToast } from '../hooks/useToast';
+import { useBodyScrollLock, useModalScrollForwarding } from '../hooks/useBodyScrollLock';
 import { ParcelItem, ParcelStatus } from '../types';
 
 interface AdminDashboardModalProps {
@@ -57,6 +58,22 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   } = useAuthParcel();
   
   const toast = useToast();
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const isStaffMember = currentUser?.role === 'admin' || currentUser?.role === 'team';
+  const isVerifiedAdmin = currentUser?.role === 'admin';
+  useBodyScrollLock(isOpen);
+  useModalScrollForwarding(backdropRef, isOpen, isStaffMember);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const [activeTab, setActiveTab] = useState<'manifest' | 'analytics' | 'tripsheet'>('manifest');
   const [manifestSearch, setManifestSearch] = useState('');
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<'all' | 'pending_approval' | 'ordered' | 'picked' | 'shipped'>('all');
@@ -144,14 +161,18 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isStaffMember = currentUser?.role === 'admin' || currentUser?.role === 'team';
-  const isVerifiedAdmin = currentUser?.role === 'admin';
-
   if (!isStaffMember) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs min-h-[100dvh]">
+      <div
+        ref={backdropRef}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs overflow-hidden overscroll-none touch-none min-h-[100dvh]"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
+      >
         <div
-          className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 text-center space-y-4"
+          data-modal-scroll="true"
+          className="relative w-full max-w-md max-h-[90dvh] overflow-y-auto overscroll-contain touch-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 text-center space-y-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="admin-auth-gate-title"
@@ -160,12 +181,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer"
+            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white cursor-pointer transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
 
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200 dark:border-amber-800">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center border border-amber-200 dark:border-amber-800">
             <Lock className="w-7 h-7" />
           </div>
 
@@ -188,7 +209,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   onClose();
                   onOpenAuth();
                 }}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#0038BD] hover:bg-[#002d99] text-white text-xs font-bold cursor-pointer min-h-[44px]"
+                className="flex-1 py-3 px-4 rounded-xl bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white text-xs font-bold cursor-pointer min-h-[44px] transition-colors"
               >
                 {currentUser ? 'Switch to Admin Account' : 'Sign In as Admin'}
               </button>
@@ -196,7 +217,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold cursor-pointer min-h-[44px]"
+              className="py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600 text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white text-xs font-bold cursor-pointer min-h-[44px] transition-colors"
             >
               Close
             </button>
@@ -351,9 +372,15 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/75 backdrop-blur-xs overflow-y-auto min-h-[100dvh]">
+    <div
+      ref={backdropRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/75 backdrop-blur-xs overflow-hidden overscroll-none touch-none min-h-[100dvh]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div 
-        className="relative w-full max-w-6xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto max-h-[94dvh] flex flex-col transition-all duration-200"
+        className="relative w-full max-w-6xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden max-h-[94dvh] flex flex-col touch-auto transition-all duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-dialog-title"
@@ -363,20 +390,20 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           <button 
             onClick={onClose}
             aria-label="Close admin dashboard"
-            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors text-white focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer min-w-[44px] min-h-[44px]"
+            className="absolute top-4 right-4 w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/30 flex items-center justify-center transition-colors text-white/90 hover:text-white active:text-white focus:outline-none focus:ring-2 focus:ring-white/40 cursor-pointer min-w-[44px] min-h-[44px]"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pr-12">
             <div>
-              <div className="flex items-center gap-2 text-[#EF8E01] font-black text-xs uppercase tracking-wider mb-1">
+              <div className="flex items-center gap-2 text-amber-300 font-black text-xs uppercase tracking-wider mb-1">
                 <ShieldCheck className="w-4 h-4 shrink-0" />
                 <span>Joshi Couriers: Central Operations &amp; Admin Console</span>
               </div>
               <h2 id="admin-dialog-title" className="text-xl sm:text-2xl font-black tracking-tight text-white flex flex-wrap items-center gap-2">
                 <span>Fleet &amp; Dispatch Control</span>
-                <span className="text-[10px] bg-emerald-500 text-white px-2.5 py-0.5 rounded-full font-bold uppercase whitespace-nowrap">
+                <span className="text-[10px] bg-emerald-700 text-white px-2.5 py-0.5 rounded-full font-bold uppercase whitespace-nowrap">
                   Live Corridor Sync
                 </span>
               </h2>
@@ -392,7 +419,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
               <button
                 onClick={copyTripManifest}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors border border-white/20 shadow-xs cursor-pointer min-h-[44px]"
+                className="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/30 text-white hover:text-white active:text-white text-xs font-bold flex items-center gap-1.5 transition-colors border border-white/25 shadow-xs cursor-pointer min-h-[44px]"
                 title="Copy formatted trip manifest for WhatsApp dispatch"
               >
                 {copiedManifest ? (
@@ -402,7 +429,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   </>
                 ) : (
                   <>
-                    <Copy className="w-4 h-4 text-[#EF8E01]" />
+                    <Copy className="w-4 h-4 text-amber-300" />
                     <span>Copy WhatsApp Manifest</span>
                   </>
                 )}
@@ -413,7 +440,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   onClose();
                   onOpenBooking();
                 }}
-                className="px-3.5 py-2 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer min-h-[44px]"
+                className="px-3.5 py-2 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer min-h-[44px]"
               >
                 <Package className="w-4 h-4" />
                 <span>+ New Booking</span>
@@ -483,16 +510,16 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         <div className="flex border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 pt-2 bg-slate-50/50 dark:bg-slate-900/50 shrink-0 gap-2 sm:gap-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab('manifest')}
-            className={`pb-3 text-xs sm:text-sm font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer min-h-[44px] ${
+            className={`pb-3 px-1 text-xs sm:text-sm font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer min-h-[44px] ${
               activeTab === 'manifest'
-                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-400 dark:border-blue-400'
-                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-300 dark:border-blue-400 hover:text-[#002888] dark:hover:text-blue-200'
+                : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
             }`}
           >
             <Truck className="w-4 h-4" />
             <span>Live Parcel Manifest ({parcels.length})</span>
             {phaseCounts.pending_approval > 0 && (
-              <span className="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black leading-none animate-pulse">
+              <span className="bg-amber-500 text-slate-950 text-[10px] px-1.5 py-0.5 rounded-full font-black leading-none animate-pulse">
                 {phaseCounts.pending_approval} new
               </span>
             )}
@@ -500,10 +527,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`pb-3 text-xs sm:text-sm font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer min-h-[44px] ${
+            className={`pb-3 px-1 text-xs sm:text-sm font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer min-h-[44px] ${
               activeTab === 'analytics'
-                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-400 dark:border-blue-400'
-                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-300 dark:border-blue-400 hover:text-[#002888] dark:hover:text-blue-200'
+                : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -512,10 +539,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
           <button
             onClick={() => setActiveTab('tripsheet')}
-            className={`pb-3 text-xs sm:text-sm font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer min-h-[44px] ${
+            className={`pb-3 px-1 text-xs sm:text-sm font-bold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer min-h-[44px] ${
               activeTab === 'tripsheet'
-                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-400 dark:border-blue-400'
-                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                ? 'border-[#0038BD] text-[#0038BD] dark:text-blue-300 dark:border-blue-400 hover:text-[#002888] dark:hover:text-blue-200'
+                : 'border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -525,11 +552,14 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
         {/* Tab 1: Live Parcel Manifest & Status Controls */}
         {activeTab === 'manifest' && (
-          <div className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6 space-y-4">
+          <div
+            data-modal-scroll="true"
+            className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5 md:p-6 space-y-4"
+          >
             
             {/* Quick Phase Filter Badges */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-slate-400 font-bold uppercase text-[10px] mr-1 hidden sm:inline">
+              <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] mr-1 hidden sm:inline">
                 Corridor Phase:
               </span>
               
@@ -538,12 +568,16 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 onClick={() => setSelectedPhaseFilter('all')}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer min-h-[38px] flex items-center gap-1.5 ${
                   selectedPhaseFilter === 'all'
-                    ? 'bg-[#0038BD] text-white shadow-xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                    ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-xs'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white active:bg-slate-300 dark:active:bg-slate-600 active:text-slate-950 dark:active:text-white'
                 }`}
               >
                 <span>All Parcels</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20">
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  selectedPhaseFilter === 'all'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100'
+                }`}>
                   {phaseCounts.all}
                 </span>
               </button>
@@ -553,13 +587,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 onClick={() => setSelectedPhaseFilter('pending_approval')}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer min-h-[38px] flex items-center gap-1.5 ${
                   selectedPhaseFilter === 'pending_approval'
-                    ? 'bg-amber-600 text-white shadow-xs'
-                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100'
+                    ? 'bg-amber-700 hover:bg-amber-800 active:bg-amber-900 text-white hover:text-white active:text-white shadow-xs'
+                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60 hover:text-amber-950 dark:hover:text-amber-100 active:bg-amber-200 dark:active:bg-amber-800/80 active:text-amber-950 dark:active:text-white'
                 }`}
               >
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>Needs Approval</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500 text-white">
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                  selectedPhaseFilter === 'pending_approval'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-amber-500 text-slate-950'
+                }`}>
                   {phaseCounts.pending_approval}
                 </span>
               </button>
@@ -569,13 +607,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 onClick={() => setSelectedPhaseFilter('ordered')}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer min-h-[38px] flex items-center gap-1.5 ${
                   selectedPhaseFilter === 'ordered'
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100'
+                    ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-xs'
+                    : 'bg-blue-50 dark:bg-blue-950/40 text-[#0038BD] dark:text-blue-200 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60 hover:text-[#002888] dark:hover:text-blue-100 active:bg-blue-200 dark:active:bg-blue-800/80 active:text-[#002070] dark:active:text-white'
                 }`}
               >
                 <Package className="w-3.5 h-3.5" />
                 <span>Phase 1: Ordered</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500 text-white">
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  selectedPhaseFilter === 'ordered'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-blue-600 text-white'
+                }`}>
                   {phaseCounts.ordered}
                 </span>
               </button>
@@ -585,13 +627,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 onClick={() => setSelectedPhaseFilter('picked')}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer min-h-[38px] flex items-center gap-1.5 ${
                   selectedPhaseFilter === 'picked'
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                    ? 'bg-indigo-700 hover:bg-indigo-800 active:bg-indigo-900 text-white hover:text-white active:text-white shadow-xs'
+                    : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 hover:text-indigo-950 dark:hover:text-indigo-100 active:bg-indigo-200 dark:active:bg-indigo-800/80 active:text-indigo-950 dark:active:text-white'
                 }`}
               >
                 <Truck className="w-3.5 h-3.5" />
                 <span>Phase 2: In Van (Picked)</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-500 text-white">
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  selectedPhaseFilter === 'picked'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-indigo-700 text-white'
+                }`}>
                   {phaseCounts.picked}
                 </span>
               </button>
@@ -601,13 +647,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 onClick={() => setSelectedPhaseFilter('shipped')}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer min-h-[38px] flex items-center gap-1.5 ${
                   selectedPhaseFilter === 'shipped'
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
+                    ? 'bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white hover:text-white active:text-white shadow-xs'
+                    : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 hover:text-emerald-950 dark:hover:text-emerald-100 active:bg-emerald-200 dark:active:bg-emerald-800/80 active:text-emerald-950 dark:active:text-white'
                 }`}
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Phase 3: Shipped (Delivered)</span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500 text-white">
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                  selectedPhaseFilter === 'shipped'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-emerald-700 text-white'
+                }`}>
                   {phaseCounts.shipped}
                 </span>
               </button>
@@ -617,7 +667,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             {phaseCounts.pending_approval > 0 && (
               <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 font-bold">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-bold">
                     !
                   </div>
                   <div>
@@ -634,7 +684,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   type="button"
                   disabled={isBulkProcessing}
                   onClick={handleBulkApprove}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 disabled:opacity-60 min-h-[44px]"
+                  className="px-4 py-2 bg-amber-700 hover:bg-amber-800 active:bg-amber-900 text-white hover:text-white active:text-white font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 disabled:opacity-60 min-h-[44px]"
                 >
                   {isBulkProcessing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   <span>Approve All ({phaseCounts.pending_approval})</span>
@@ -662,7 +712,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   type="button"
                   disabled={isBulkProcessing}
                   onClick={handleBulkMarkPicked}
-                  className="px-4 py-2 bg-[#0038BD] hover:bg-blue-700 text-white font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 disabled:opacity-60 min-h-[44px]"
+                  className="px-4 py-2 bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 disabled:opacity-60 min-h-[44px]"
                 >
                   {isBulkProcessing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
                   <span>Mark All Loaded (In Van)</span>
@@ -685,7 +735,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 {manifestSearch && (
                   <button 
                     onClick={() => setManifestSearch('')}
-                    className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                    aria-label="Clear search"
+                    className="absolute right-2.5 top-2.5 text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -752,7 +803,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         setSelectedRouteFilter('all');
                         setSelectedPaymentFilter('all');
                       }}
-                      className="mt-3 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 dark:bg-slate-700 dark:text-slate-200 cursor-pointer"
+                      className="mt-3 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-xs font-bold text-slate-800 hover:text-slate-950 active:text-slate-950 dark:bg-slate-700 dark:hover:bg-slate-600 dark:active:bg-slate-500 dark:text-slate-100 dark:hover:text-white dark:active:text-white cursor-pointer transition-colors"
                     >
                       Reset All Filters
                     </button>
@@ -784,7 +835,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                 navigator.clipboard.writeText(parcel.id);
                                 toast.info(`Copied ${parcel.id} to clipboard.`);
                               }}
-                              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer p-0.5"
+                              className="text-slate-500 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white hover:bg-blue-100/70 dark:hover:bg-blue-900/60 rounded-md cursor-pointer p-0.5 transition-colors"
                               title="Copy tracking ID"
                             >
                               <Copy className="w-3.5 h-3.5" />
@@ -814,8 +865,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                             onClick={() => handlePaymentToggle(parcel)}
                             className={`px-2.5 py-1 rounded-xl text-xs font-black flex items-center gap-1 transition-all cursor-pointer ${
                               parcel.paymentStatus === 'collected'
-                                ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                                : 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 hover:bg-amber-100'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/70 hover:text-emerald-950 dark:hover:text-emerald-100 active:bg-emerald-200 dark:active:bg-emerald-800/80 active:text-emerald-950 dark:active:text-white'
+                                : 'bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/70 hover:text-amber-950 dark:hover:text-amber-100 active:bg-amber-200 dark:active:bg-amber-800/80 active:text-amber-950 dark:active:text-white'
                             }`}
                             title="Click to toggle payment status"
                           >
@@ -837,7 +888,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                   meta: { trackingId: parcel.id },
                                 });
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors min-h-[38px]"
+                              className="px-3 py-1.5 rounded-xl bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors min-h-[38px]"
                             >
                               <CheckCircle2 className="w-4 h-4" />
                               <span>Approve Order</span>
@@ -854,7 +905,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                   meta: { trackingId: parcel.id },
                                 });
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors min-h-[38px]"
+                              className="px-3 py-1.5 rounded-xl bg-indigo-700 hover:bg-indigo-800 active:bg-indigo-900 text-white hover:text-white active:text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors min-h-[38px]"
                             >
                               <Truck className="w-4 h-4" />
                               <span>Transporter Received (Picked)</span>
@@ -871,7 +922,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                   meta: { trackingId: parcel.id },
                                 });
                               }}
-                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors min-h-[38px]"
+                              className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white hover:text-white active:text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors min-h-[38px]"
                             >
                               <CheckCircle2 className="w-4 h-4" />
                               <span>Mark Shipped (Delivered)</span>
@@ -912,7 +963,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                             <button
                               type="button"
                               onClick={() => setConfirmDeleteId(confirmDeleteId === parcel.id ? null : parcel.id)}
-                              className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+                              className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-200 border border-rose-200 dark:border-rose-800 hover:bg-rose-100 dark:hover:bg-rose-900/70 hover:text-rose-950 dark:hover:text-white active:bg-rose-200 dark:active:bg-rose-800/80 active:text-rose-950 dark:active:text-white transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
                               title="Admin: Delete parcel record"
                               aria-label={`Delete parcel ${parcel.id}`}
                             >
@@ -935,7 +986,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                               type="button"
                               onClick={() => setConfirmDeleteId(null)}
                               disabled={deletingId === parcel.id}
-                              className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold cursor-pointer min-h-[36px]"
+                              className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white font-bold cursor-pointer min-h-[36px] transition-colors"
                             >
                               Cancel
                             </button>
@@ -943,7 +994,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                               type="button"
                               onClick={() => handleDeleteParcel(parcel.id)}
                               disabled={deletingId === parcel.id}
-                              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-60 min-h-[36px]"
+                              className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-800 active:bg-rose-900 text-white hover:text-white active:text-white font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-60 min-h-[36px] transition-colors"
                             >
                               {deletingId === parcel.id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                               <span>{deletingId === parcel.id ? 'Deleting...' : 'Delete Permanently'}</span>
@@ -955,7 +1006,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                       {/* 3-Column Detailed Logistics Information */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 text-xs">
                         {/* Sender details with 1-click Contact */}
-                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-750">
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700">
                           <span className="text-slate-400 dark:text-slate-400 font-bold uppercase text-[10px] block">
                             Sender Information (Jalna)
                           </span>
@@ -969,7 +1020,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                           <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-slate-200/70 dark:border-slate-700">
                             <a 
                               href={`tel:${parcel.senderPhone}`} 
-                              className="inline-flex items-center gap-1 text-[#0038BD] dark:text-blue-400 hover:underline font-bold text-[11px]"
+                              className="inline-flex items-center gap-1 text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white hover:underline font-bold text-[11px]"
                             >
                               <Phone className="w-3 h-3" />
                               <span>{parcel.senderPhone}</span>
@@ -979,17 +1030,17 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                               href={getSenderWhatsAppUrl(parcel)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold hover:bg-emerald-100"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/70 hover:text-emerald-950 dark:hover:text-emerald-100 active:bg-emerald-200 dark:active:bg-emerald-800/80 active:text-emerald-950 dark:active:text-white transition-colors"
                               title="Send WhatsApp update to sender"
                             >
-                              <MessageCircle className="w-3 h-3 text-emerald-600" />
+                              <MessageCircle className="w-3 h-3 text-emerald-700 dark:text-emerald-300" />
                               <span>WhatsApp</span>
                             </a>
                           </div>
                         </div>
 
                         {/* Receiver details with 1-click Contact & ETA */}
-                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-750">
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700">
                           <span className="text-slate-400 dark:text-slate-400 font-bold uppercase text-[10px] block">
                             Receiver &amp; Drop Location ({parcel.toCity})
                           </span>
@@ -1006,7 +1057,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                               <>
                                 <a 
                                   href={`tel:${parcel.receiverPhone}`} 
-                                  className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 hover:underline font-bold text-[11px]"
+                                  className="inline-flex items-center gap-1 text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-emerald-200 active:text-emerald-950 dark:active:text-white hover:underline font-bold text-[11px]"
                                 >
                                   <Phone className="w-3 h-3" />
                                   <span>{parcel.receiverPhone}</span>
@@ -1016,10 +1067,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                                   href={getReceiverWhatsAppUrl(parcel)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold hover:bg-emerald-100"
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 text-[10px] font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/70 hover:text-emerald-950 dark:hover:text-emerald-100 active:bg-emerald-200 dark:active:bg-emerald-800/80 active:text-emerald-950 dark:active:text-white transition-colors"
                                   title="Send WhatsApp ETA alert to receiver"
                                 >
-                                  <MessageCircle className="w-3 h-3 text-emerald-600" />
+                                  <MessageCircle className="w-3 h-3 text-emerald-700 dark:text-emerald-300" />
                                   <span>WhatsApp</span>
                                 </a>
                               </>
@@ -1030,7 +1081,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         </div>
 
                         {/* Cargo & Notes details */}
-                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-750 flex flex-col justify-between">
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 flex flex-col justify-between">
                           <div>
                             <span className="text-slate-400 dark:text-slate-400 font-bold uppercase text-[10px] block">
                               Commodity &amp; Packaging
@@ -1070,7 +1121,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
         {/* Tab 2: Analytics & KPIs View */}
         {activeTab === 'analytics' && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          <div
+            data-modal-scroll="true"
+            className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-6"
+          >
             
             {/* Top KPI Cards Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -1163,7 +1217,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
             {/* Vehicle & Trip Schedule Banner */}
             <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-900 to-[#0038BD] text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <div className="flex items-center gap-2 text-[#EF8E01] text-xs font-black uppercase tracking-wider">
+                <div className="flex items-center gap-2 text-amber-300 text-xs font-black uppercase tracking-wider">
                   <Truck className="w-4 h-4" />
                   <span>Daily Morning Corridor Run: MH21 V 6370</span>
                 </div>
@@ -1296,7 +1350,10 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
         {/* Tab 3: Driver Trip Sheet & WhatsApp Dispatch View */}
         {activeTab === 'tripsheet' && (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          <div
+            data-modal-scroll="true"
+            className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4"
+          >
             
             {/* Action Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
@@ -1314,7 +1371,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 <button
                   type="button"
                   onClick={copyTripManifest}
-                  className="px-3.5 py-2 rounded-xl bg-[#0038BD] hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer min-h-[44px]"
+                  className="px-3.5 py-2 rounded-xl bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer min-h-[44px]"
                 >
                   <Copy className="w-4 h-4" />
                   <span>{copiedManifest ? 'Copied!' : 'Copy for WhatsApp'}</span>
@@ -1323,7 +1380,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer min-h-[44px]"
+                  className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 active:bg-slate-200 dark:active:bg-slate-600 text-slate-800 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white active:text-slate-950 dark:active:text-white border border-slate-300 dark:border-slate-600 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer min-h-[44px]"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Print Sheet</span>
@@ -1333,7 +1390,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
             {/* Printable Trip Manifest Table */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-2xs">
-              <div className="p-4 bg-slate-100 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="p-4 bg-slate-100 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
                   <span>Departure: Jalna (4:00 - 5:00 AM)</span>
                   <span>➔</span>
@@ -1359,7 +1416,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
                     {parcels.map((parcel, idx) => (
-                      <tr key={parcel.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-750/50">
+                      <tr key={parcel.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-700/50">
                         <td className="py-3 px-3 font-mono font-bold text-slate-400">
                           {idx + 1}
                         </td>
@@ -1380,7 +1437,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                           </span>
                         </td>
                         <td className="py-3 px-3 font-mono">
-                          <a href={`tel:${parcel.receiverPhone}`} className="text-[#0038BD] dark:text-blue-400 hover:underline">
+                          <a href={`tel:${parcel.receiverPhone}`} className="text-[#0038BD] dark:text-blue-300 hover:text-[#002888] dark:hover:text-blue-200 active:text-[#002070] dark:active:text-white hover:underline">
                             {parcel.receiverPhone || 'N/A'}
                           </a>
                         </td>
@@ -1394,9 +1451,9 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                         </td>
                         <td className="py-3 px-3 font-bold">
                           {parcel.paymentStatus === 'collected' ? (
-                            <span className="text-emerald-600 dark:text-emerald-400">PAID (₹{parcel.fare})</span>
+                            <span className="text-emerald-700 dark:text-emerald-400">PAID (₹{parcel.fare})</span>
                           ) : (
-                            <span className="text-amber-600 dark:text-amber-400 font-black">₹{parcel.fare} COD</span>
+                            <span className="text-amber-700 dark:text-amber-400 font-black">₹{parcel.fare} COD</span>
                           )}
                         </td>
                         <td className="py-3 px-3">
@@ -1415,13 +1472,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
         )}
 
         {/* Footer info & Controls */}
-        <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+        <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-300 shrink-0">
           <div className="flex flex-wrap items-center gap-2">
             <span>Fleet: Mahindra Maxximo MH21 V 6370</span>
             <span>•</span>
             <span>Morning Route: Jalna (4:00 - 5:00 AM) ➔ Partur (6:00 - 6:30 AM)</span>
             <span>•</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-bold">Doorstep Delivery: 6:30 - 8:30 AM</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-bold">Doorstep Delivery: 6:30 - 8:30 AM</span>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -1430,13 +1487,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 onClose();
                 onOpenBooking();
               }}
-              className="px-4 py-2 rounded-xl bg-[#EF8E01] text-white font-bold text-xs hover:bg-[#d88001] transition-colors cursor-pointer min-h-[44px]"
+              className="px-4 py-2 rounded-xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 font-bold text-xs transition-colors cursor-pointer min-h-[44px]"
             >
               + Create Booking
             </button>
             <button
               onClick={onClose}
-              className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer min-h-[44px]"
+              className="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-600 text-slate-800 hover:text-slate-950 active:text-slate-950 dark:text-slate-200 dark:hover:text-white dark:active:text-white text-xs font-bold transition-colors cursor-pointer min-h-[44px]"
             >
               Close
             </button>

@@ -17,12 +17,16 @@ import { BookingModal } from './components/BookingModal';
 import { AuthModal } from './components/AuthModal';
 import { CustomerParcelsModal } from './components/CustomerParcelsModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { useBodyScrollLock } from './hooks/useBodyScrollLock';
 
 function MainApp() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCustomerParcelsOpen, setIsCustomerParcelsOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  const isAnyModalOpen = isBookingOpen || isAuthOpen || isCustomerParcelsOpen || isAdminOpen;
+  useBodyScrollLock(isAnyModalOpen);
 
   return (
     <div className="min-h-[100dvh] bg-[#FDFDFE] dark:bg-[#070D1A] text-slate-900 dark:text-slate-100 flex flex-col antialiased selection:bg-[#EF8E01]/20 selection:text-[#0038BD] dark:selection:text-blue-400 w-full max-w-full transition-colors duration-200 relative">
@@ -38,58 +42,65 @@ function MainApp() {
         <div className="absolute inset-0 bg-[radial-gradient(#0038BD_0.75px,transparent_0.75px)] dark:bg-[radial-gradient(#3B82F6_0.75px,transparent_0.75px)] [background-size:48px_48px] opacity-[0.035] dark:opacity-[0.05]" />
       </div>
 
-      {/* Accessibility Skip Link */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#0038BD] focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#EF8E01]"
+      <div
+        id="app-page-shell"
+        inert={isAnyModalOpen || undefined}
+        aria-hidden={isAnyModalOpen || undefined}
+        className={`flex-1 flex flex-col w-full max-w-full ${isAnyModalOpen ? 'pointer-events-none select-none' : ''}`}
       >
-        Skip to main content
-      </a>
+        {/* Accessibility Skip Link */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#0038BD] focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#EF8E01]"
+        >
+          Skip to main content
+        </a>
 
-      {/* 1. Header with Logo, Auth, Dashboard Access, Book Pickup CTA, and Mobile Menu */}
-      <Header 
-        onOpenBooking={() => setIsBookingOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenCustomerParcels={() => setIsCustomerParcelsOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
-      />
-
-      {/* Main Container matching the visual layout */}
-      <main id="main-content" className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-8 min-w-0">
-        
-        {/* 2. Hero Section: 2-Column Proposition + Real Vehicle (Mahindra Maxximo MH21 V 6370) */}
-        <Hero />
-
-        {/* 3. Route & Delivery Timeline Card */}
-        <RouteTimelineCard />
-
-        {/* 4. Regular Sender Parcel History & Admin Analytics Access Grid */}
-        <PortalAccessBanner
+        {/* 1. Header with Logo, Auth, Dashboard Access, Book Pickup CTA, and Mobile Menu */}
+        <Header 
+          onOpenBooking={() => setIsBookingOpen(true)}
+          onOpenAuth={() => setIsAuthOpen(true)}
           onOpenCustomerParcels={() => setIsCustomerParcelsOpen(true)}
           onOpenAdmin={() => setIsAdminOpen(true)}
-          onOpenAuth={() => setIsAuthOpen(true)}
-          onOpenBooking={() => setIsBookingOpen(true)}
         />
 
-        {/* 5. Important Information Bar */}
-        <NoticeBar />
+        {/* Main Container matching the visual layout */}
+        <main id="main-content" className="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-8 min-w-0">
+          
+          {/* 2. Hero Section: 2-Column Proposition + Real Vehicle (Mahindra Maxximo MH21 V 6370) */}
+          <Hero />
 
-        {/* 6. Three Business Value & Trust Cards */}
-        <BusinessFeatures />
+          {/* 3. Route & Delivery Timeline Card */}
+          <RouteTimelineCard />
 
-        {/* 7. Pricing & Action Buttons Section */}
-        <PricingCtaSection onOpenBooking={() => setIsBookingOpen(true)} />
+          {/* 4. Regular Sender Parcel History & Admin Analytics Access Grid */}
+          <PortalAccessBanner
+            onOpenCustomerParcels={() => setIsCustomerParcelsOpen(true)}
+            onOpenAdmin={() => setIsAdminOpen(true)}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenBooking={() => setIsBookingOpen(true)}
+          />
 
-        {/* 8. Frequently Asked Questions */}
-        <FAQSection onOpenBooking={() => setIsBookingOpen(true)} />
+          {/* 5. Important Information Bar */}
+          <NoticeBar />
 
-        {/* 9. Bottom Trust Strip */}
-        <TrustBar />
+          {/* 6. Three Business Value & Trust Cards */}
+          <BusinessFeatures />
 
-      </main>
+          {/* 7. Pricing & Action Buttons Section */}
+          <PricingCtaSection onOpenBooking={() => setIsBookingOpen(true)} />
 
-      {/* 9. Authentic Local Footer with Trusted Local Service differentiators */}
-      <Footer onOpenBooking={() => setIsBookingOpen(true)} />
+          {/* 8. Frequently Asked Questions */}
+          <FAQSection onOpenBooking={() => setIsBookingOpen(true)} />
+
+          {/* 9. Bottom Trust Strip */}
+          <TrustBar />
+
+        </main>
+
+        {/* 9. Authentic Local Footer with Trusted Local Service differentiators */}
+        <Footer onOpenBooking={() => setIsBookingOpen(true)} />
+      </div>
 
       {/* Doorstep Pickup Booking Modal */}
       <BookingModal

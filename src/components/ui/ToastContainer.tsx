@@ -167,7 +167,7 @@ const SingleToast: React.FC<SingleToastProps> = ({ toast, onDismiss }) => {
                   toast.action?.onClick();
                   onDismiss(toast.id);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-[0.98] text-white text-xs font-semibold transition-all cursor-pointer border border-white/15 shadow-2xs focus:outline-none focus:ring-2 focus:ring-white/40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/30 active:scale-[0.98] text-white hover:text-white active:text-white text-xs font-semibold transition-all cursor-pointer border border-white/20 shadow-2xs focus:outline-none focus:ring-2 focus:ring-white/40"
               >
                 <span>{toast.action.label}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -181,7 +181,7 @@ const SingleToast: React.FC<SingleToastProps> = ({ toast, onDismiss }) => {
           type="button"
           onClick={() => onDismiss(toast.id)}
           aria-label="Dismiss notification"
-          className="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
+          className="shrink-0 p-1.5 rounded-lg text-slate-300 hover:text-white active:text-white hover:bg-white/15 active:bg-white/25 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
         >
           <X className="w-4 h-4" />
         </button>

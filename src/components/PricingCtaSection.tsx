@@ -106,7 +106,7 @@ export const PricingCtaSection: React.FC<PricingCtaSectionProps> = ({ onOpenBook
         <button
           onClick={onOpenBooking}
           id="main-book-doorstep-pickup-btn"
-          className="cta-action-btn w-full h-14 sm:h-14 px-6 rounded-2xl bg-[#EF8E01] hover:bg-[#d88001] active:scale-[0.98] text-white font-extrabold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-md shadow-[#EF8E01]/25 hover:shadow-lg transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-[#EF8E01]/30"
+          className="cta-action-btn w-full h-14 sm:h-14 px-6 rounded-2xl bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] active:scale-[0.98] text-slate-950 hover:text-slate-950 active:text-slate-950 font-extrabold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-md shadow-[#EF8E01]/25 hover:shadow-lg transition-all duration-150 focus:outline-none focus:ring-4 focus:ring-[#EF8E01]/40 cursor-pointer"
         >
           <span>Book Doorstep Pickup</span>
           <ArrowRight className="w-5 h-5 stroke-[2.5]" />
@@ -118,9 +118,9 @@ export const PricingCtaSection: React.FC<PricingCtaSectionProps> = ({ onOpenBook
           target="_blank"
           rel="noopener noreferrer"
           id="main-whatsapp-btn"
-          className="cta-action-btn w-full h-12 sm:h-12 px-6 rounded-2xl bg-white dark:bg-slate-900 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40 active:scale-[0.98] text-slate-800 dark:text-slate-200 hover:text-emerald-800 dark:hover:text-emerald-300 border-2 border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-600 font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xs transition-all duration-150"
+          className="cta-action-btn w-full h-12 sm:h-12 px-6 rounded-2xl bg-white dark:bg-slate-900 hover:bg-emerald-50/80 dark:hover:bg-emerald-950/50 active:bg-emerald-100 dark:active:bg-emerald-900/70 active:scale-[0.98] text-slate-800 dark:text-slate-100 hover:text-emerald-900 dark:hover:text-emerald-200 active:text-emerald-950 dark:active:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-600 dark:hover:border-emerald-500 font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xs transition-all duration-150"
         >
-          <MessageCircle className="w-5 h-5 text-[#25D366] fill-[#25D366]/20" />
+          <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           <span>Chat on WhatsApp</span>
         </a>
 

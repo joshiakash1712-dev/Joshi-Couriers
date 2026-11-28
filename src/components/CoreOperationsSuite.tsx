@@ -143,14 +143,14 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EF8E01]/20 border border-[#EF8E01]/40 text-[#EF8E01] text-xs font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EF8E01]/20 border border-[#EF8E01]/40 text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">
               <Sparkles className="w-3.5 h-3.5" />
               <span>REGIONAL CORRIDOR CONSOLE</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
               Daily Corridor Management
             </h2>
-            <p className="text-sm sm:text-base text-slate-400 mt-1 max-w-xl">
+            <p className="text-sm sm:text-base text-slate-300 mt-1 max-w-xl">
               Daily run timetable, instant village-to-city rate calculator, and direct parcel tracking across all {ROUTE_LOCATIONS.length} stops.
             </p>
           </div>
@@ -159,37 +159,37 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
           <div className="inline-flex p-1.5 rounded-2xl bg-slate-800/90 border border-slate-700/80 shadow-inner">
             <button
               onClick={() => setActiveTab('schedules')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'schedules'
-                  ? 'bg-[#0038BD] text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                  ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-md'
+                  : 'text-slate-300 hover:text-white active:text-white hover:bg-slate-700/70 active:bg-slate-700'
               }`}
             >
-              <Clock className="w-4 h-4 text-[#EF8E01]" />
+              <Clock className="w-4 h-4 text-amber-300" />
               <span>Daily Runs</span>
             </button>
 
             <button
               onClick={() => setActiveTab('rates')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'rates'
-                  ? 'bg-[#0038BD] text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                  ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-md'
+                  : 'text-slate-300 hover:text-white active:text-white hover:bg-slate-700/70 active:bg-slate-700'
               }`}
             >
-              <Calculator className="w-4 h-4 text-[#EF8E01]" />
+              <Calculator className="w-4 h-4 text-amber-300" />
               <span>Rate Estimator</span>
             </button>
 
             <button
               onClick={() => setActiveTab('tracking')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'tracking'
-                  ? 'bg-[#0038BD] text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                  ? 'bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white shadow-md'
+                  : 'text-slate-300 hover:text-white active:text-white hover:bg-slate-700/70 active:bg-slate-700'
               }`}
             >
-              <Search className="w-4 h-4 text-[#EF8E01]" />
+              <Search className="w-4 h-4 text-amber-300" />
               <span>Live Tracker</span>
             </button>
           </div>
@@ -226,15 +226,15 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                   </div>
 
                   <div className="sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-700">
-                    <span className="text-xs text-slate-400 block">Cutoff for Pickup Booking:</span>
-                    <span className="text-sm font-extrabold text-[#EF8E01]">09:30 AM (Same Day)</span>
+                    <span className="text-xs text-slate-300 block">Cutoff for Pickup Booking:</span>
+                    <span className="text-sm font-extrabold text-amber-300">09:30 AM (Same Day)</span>
                     <div className="mt-2">
                       <button
                         onClick={() => onOpenBooking('jalna', 'partur')}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EF8E01] hover:bg-[#d88001] text-white rounded-lg text-xs font-semibold shadow-sm transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 rounded-lg text-xs font-bold shadow-sm transition-colors cursor-pointer"
                       >
                         <span>Book Morning Slot</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
                       </button>
                     </div>
                   </div>
@@ -285,12 +285,12 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                   </div>
 
                   <div className="sm:text-right border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-700">
-                    <span className="text-xs text-slate-400 block">Cutoff for Pickup Booking:</span>
-                    <span className="text-sm font-extrabold text-[#EF8E01]">02:30 PM (Same Day)</span>
+                    <span className="text-xs text-slate-300 block">Cutoff for Pickup Booking:</span>
+                    <span className="text-sm font-extrabold text-amber-300">02:30 PM (Same Day)</span>
                     <div className="mt-2">
                       <button
                         onClick={() => onOpenBooking('jalna', 'partur')}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0038BD] hover:bg-[#002d99] text-white rounded-lg text-xs font-semibold shadow-sm transition-colors border border-blue-400/30"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white rounded-lg text-xs font-semibold shadow-sm transition-colors border border-blue-400/30 cursor-pointer"
                       >
                         <span>Book Afternoon Slot</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -357,9 +357,9 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                 <span className="text-xs text-blue-200 block mb-1">Direct Courier Helpline</span>
                 <a
                   href="tel:+919404040606"
-                  className="text-base font-extrabold text-white hover:text-[#EF8E01] transition-colors flex items-center justify-center gap-2"
+                  className="text-base font-extrabold text-white hover:text-amber-300 active:text-amber-200 transition-colors flex items-center justify-center gap-2"
                 >
-                  <Phone className="w-4 h-4 text-[#EF8E01]" />
+                  <Phone className="w-4 h-4 text-amber-300" />
                   <span>+91 94040 40606</span>
                 </a>
               </div>
@@ -432,13 +432,13 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                       key={cat.id}
                       type="button"
                       onClick={() => setCalcCategory(cat.id as any)}
-                      className={`p-3 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all text-left ${
+                      className={`p-3 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all text-left cursor-pointer ${
                         calcCategory === cat.id
-                          ? 'bg-[#0038BD]/40 text-white border-blue-400 ring-1 ring-blue-400'
-                          : 'bg-slate-900/60 text-slate-400 border-slate-700 hover:bg-slate-700'
+                          ? 'bg-[#0038BD]/60 text-white hover:text-white active:text-white border-blue-400 ring-1 ring-blue-400'
+                          : 'bg-slate-900/60 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white active:bg-slate-600 active:text-white'
                       }`}
                     >
-                      <span className="text-[#EF8E01]">{cat.icon}</span>
+                      <span className="text-amber-300">{cat.icon}</span>
                       <span className="truncate">{cat.label}</span>
                     </button>
                   ))}
@@ -461,10 +461,10 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                       key={w.id}
                       type="button"
                       onClick={() => setCalcWeight(w.id)}
-                      className={`py-2 px-3 rounded-lg border text-xs font-medium transition-all ${
+                      className={`py-2 px-3 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
                         calcWeight === w.id
-                          ? 'bg-[#EF8E01] text-white border-[#EF8E01] font-bold'
-                          : 'bg-slate-900/60 text-slate-400 border-slate-700 hover:bg-slate-700'
+                          ? 'bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 border-[#EF8E01] font-bold'
+                          : 'bg-slate-900/60 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white active:bg-slate-600 active:text-white'
                       }`}
                     >
                       {w.label}
@@ -477,7 +477,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
             {/* Right Col: Price Breakdown Card */}
             <div className="lg:col-span-5 bg-gradient-to-br from-[#0038BD] to-blue-900 rounded-2xl p-7 text-white shadow-xl relative overflow-hidden space-y-5">
               <div className="flex items-center justify-between border-b border-white/20 pb-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#EF8E01]">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
                   TRANSPARENT LOCAL RATE
                 </span>
                 <span className="text-xs text-blue-200">No Hidden Charges</span>
@@ -512,10 +512,10 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
 
               <button
                 onClick={() => onOpenBooking(calcFromId, calcToId)}
-                className="w-full py-3.5 px-4 bg-[#EF8E01] hover:bg-[#d88001] text-white rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-4 bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Book Pickup at this Rate</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-slate-950" />
               </button>
 
               <p className="text-[11px] text-blue-200/70 text-center">
@@ -548,7 +548,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                   />
                   <button
                     type="submit"
-                    className="absolute right-2 top-2 bottom-2 px-3.5 bg-[#0038BD] hover:bg-[#002d99] text-white rounded-lg text-xs font-semibold flex items-center gap-1.5"
+                    className="absolute right-2 top-2 bottom-2 px-3.5 bg-[#0038BD] hover:bg-[#002d99] active:bg-[#002070] text-white hover:text-white active:text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     {isSearching ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
                     <span>Track</span>
@@ -558,7 +558,7 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
 
               {/* Sample Demo Buttons */}
               <div className="pt-3 border-t border-slate-700">
-                <span className="text-[11px] text-slate-400 block mb-2 font-medium">
+                <span className="text-[11px] text-slate-300 block mb-2 font-medium">
                   Try live sample parcel IDs:
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -570,10 +570,10 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                         setTrackingId(id);
                         setSearchedId(id);
                       }}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors ${
+                      className={`px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer ${
                         searchedId === id
-                          ? 'bg-[#EF8E01] text-white'
-                          : 'bg-slate-700/70 text-slate-300 hover:bg-slate-700'
+                          ? 'bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] text-slate-950 hover:text-slate-950 active:text-slate-950 font-bold'
+                          : 'bg-slate-700/70 text-slate-200 hover:bg-slate-700 hover:text-white active:bg-slate-600 active:text-white'
                       }`}
                     >
                       {id}
@@ -615,9 +615,9 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
                     <div
                       className={`absolute -left-6 top-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         step.done
-                          ? 'bg-emerald-500 border-emerald-400 text-white'
+                          ? 'bg-emerald-700 border-emerald-500 text-white'
                           : step.current
-                          ? 'bg-[#EF8E01] border-[#EF8E01] text-white animate-pulse'
+                          ? 'bg-[#EF8E01] border-[#EF8E01] text-slate-950 animate-pulse'
                           : 'bg-slate-900 border-slate-600'
                       }`}
                     >
@@ -626,12 +626,12 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-sm font-bold ${step.done ? 'text-white' : step.current ? 'text-[#EF8E01]' : 'text-slate-500'}`}>
+                        <span className={`text-sm font-bold ${step.done ? 'text-white' : step.current ? 'text-amber-300' : 'text-slate-400'}`}>
                           {step.title}
                         </span>
-                        <span className="text-[11px] text-slate-400 font-mono">({step.time})</span>
+                        <span className="text-[11px] text-slate-300 font-mono">({step.time})</span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-slate-300 mt-0.5">
                         {step.location}
                       </p>
                     </div>
@@ -640,13 +640,13 @@ export const CoreOperationsSuite: React.FC<CoreOperationsSuiteProps> = ({ onOpen
               </div>
 
               {/* Direct Driver Contact Link */}
-              <div className="pt-4 border-t border-slate-700 flex items-center justify-between text-xs text-slate-400">
+              <div className="pt-4 border-t border-slate-700 flex items-center justify-between text-xs text-slate-300">
                 <span>Sender: {activeTracking.sender}</span>
                 <a
                   href="https://wa.me/919404040606"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#EF8E01] hover:underline font-semibold flex items-center gap-1"
+                  className="text-amber-300 hover:text-amber-200 active:text-white hover:underline font-semibold flex items-center gap-1 transition-colors"
                 >
                   <span>Query Driver on WhatsApp</span>
                   <ChevronRight className="w-3.5 h-3.5" />

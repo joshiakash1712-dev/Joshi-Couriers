@@ -23,8 +23,8 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenBooking }) => {
       title: 'We Pick It Up',
       desc: 'Our courier driver arrives directly at your shop or home anywhere along NH-752I.',
       detail: 'Morning (10:30 AM) & Afternoon (03:30 PM) dispatches.',
-      icon: <Package className="w-6 h-6 text-[#EF8E01]" strokeWidth={2.2} />,
-      accentBg: 'bg-orange-50 border-orange-100 text-[#EF8E01]',
+      icon: <Package className="w-6 h-6 text-amber-700" strokeWidth={2.2} />,
+      accentBg: 'bg-orange-50 border-orange-100 text-amber-700',
     },
     {
       num: '03',
@@ -137,10 +137,10 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onOpenBooking }) => {
           </div>
           <button
             onClick={onOpenBooking}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#EF8E01] hover:bg-[#d88001] shadow-xs active:scale-95 transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-950 hover:text-slate-950 active:text-slate-950 bg-[#EF8E01] hover:bg-[#d88001] active:bg-[#c77400] shadow-xs active:scale-95 transition-all cursor-pointer"
           >
             <span>Book Your First Pickup</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 text-slate-950" />
           </button>
         </motion.div>
 
